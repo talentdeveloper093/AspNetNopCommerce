@@ -1,0 +1,39 @@
+﻿@model ProductDetailsModel
+@using Nop.Core.Domain.Media
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Models.Catalog;
+@{
+    Html.AddScriptParts("http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"); 
+    Html.AddScriptParts("~/Themes/everything/Scripts/ProductZoom.js");
+    Html.AddCssFileParts("~/Themes/everything/Content/ProductZoom.css");
+    
+    //int productPerRow = EngineContext.Current.Resolve<MediaSettings>().ProductThumbPerRowOnProductDetailsPage;
+    int productPerRow = 4;
+}
+<div class="gallery">
+    <div class="image-box">
+        @if (Model.DefaultPictureZoomEnabled)
+        {
+       <div class="targetarea">        
+           <img id="productzoom" alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" />        
+        </div>
+        }
+        else
+        {
+        <img id="productzoom" alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" itemprop="image" />
+        }
+    </div>
+    @if (Model.PictureModels.Count > 1)
+    {
+        <ul>
+             @foreach (var picture in Model.PictureModels)
+            {
+             <li class="product-thumb productzoom thumbs">
+                 <a class="thumb-popup-link" href="@picture.FullSizeImageUrl" data-large="@picture.FullSizeImageUrl" data-title="@picture.Title">
+                     <img src="@picture.ImageUrl" alt="@picture.AlternateText" title="@picture.Title" />
+                 </a>
+           </li> 
+          }
+      </ul>     
+    }
+</div>

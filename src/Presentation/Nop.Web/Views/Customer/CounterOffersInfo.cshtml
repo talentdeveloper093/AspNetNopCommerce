@@ -1,0 +1,197 @@
+﻿@model IEnumerable<CounterOffersModel>
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-downloadable-products-page");
+}
+@section left
+{
+    @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.DownloadableProducts })
+}
+<style>
+    .CustomBtnStyling{
+    border: none;
+    background-color: #4ab2f1;
+    padding: 10px 10px;
+    margin:2px;
+    text-align: center;
+    font-size: 11px;
+    color: #fff;
+    text-transform: uppercase;
+    }
+
+    .approvedOfferclr
+    {
+            background: green;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+      font-size: 11px;
+    }
+
+     .rejectedOfferclr
+    {
+               background: red;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+      font-size: 11px;
+    }
+</style>
+<div class="page account-page downloadable-products-page">
+    <div class="page-body">
+        @if (Model.Count() > 0)
+        {
+            <div class="table-wrapper">
+                <table class="data-table" id="CountOffersTable">
+                    <thead>
+                        <tr>
+                            <th class="" style="min-width:100px; width:100px">
+                               Product Name
+                            </th>
+                            <th class="" style="min-width:100px; width:100px">
+                                Notes
+                            </th>
+                            <th class="" style="min-width:100px; width:100px">
+                                Price
+                            </th>
+                            <th class="" style="min-width:100px; width:100px">
+                                Offer Amount
+                            </th>
+                            <th class="" style="min-width:100px; width:100px">
+                                Seller Response
+                            </th>
+                            <th class="" style="min-width:100px; width:100px">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr data-id="@item.Id">
+                                <td class="">
+                                    @item.Name
+                                </td>
+                                <td class="">
+                                    @item.MessageToSeller
+                                </td>
+                                <td class="">
+                             @item.ActualPrice
+                                </td>
+                                <td class="">
+                                    
+                                    $@item.Price
+                                </td>
+                                <td>
+                                    @{ 
+                                        if(item.OfferStatus == "Rejected")
+                                        {
+                                            <span class="rejectedOfferclr">Rejected</span>
+                                        }
+                                        else if (item.OfferStatus == "Approved")
+                                        {
+                                          <a href="/cart"><span class="approvedOfferclr">Approved</span></a>
+                                        }
+                                    }
+                                </td>
+                                <td class="">
+                                    @{
+                                        if (item.OfferStatus != "Rejected" && item.OfferStatus != "Approved")
+                                        {
+                                            <button class="CustomBtnStyling" onclick="AcceptOffer(@item.Id)">Accept</button>
+                                            <button class="CustomBtnStyling" onclick="OpenCounterPopup(@item.Id)">Counter</button>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="no-data">
+                No Countered Offers Found.
+            </div>
+        }
+    </div>
+</div>
+
+<div id="terms-of-service-warning-box" title="Counter Offer" style="display: none;">
+    <input type="hidden" id="CounterOfferProductId" />
+    <p>Your Price:</p>
+    <p> <input type="number" id="CounterOfferProductPricebx" /></p>
+    <p>Notes for Seller:</p>
+    <p> 
+        <textarea cols="19" rows="7" style="min-height:50px;" id="CounterOfferProductNotesbx"></textarea>
+    </p>
+    <p>
+        <button class="CustomBtnStyling" onclick="SubmitCountOffer()">Submit</button>
+    </p>
+</div>
+<script>
+    function OpenCounterPopup(Id)
+    {
+        $("#CounterOfferProductId").val(Id);
+        $("#terms-of-service-warning-box").dialog();
+    }
+
+    function SubmitCountOffer()
+    {
+        if($("#CounterOfferProductPricebx").val()=="")
+        {
+            alert("Please enter your desired price");
+            return;
+        }
+
+        $.ajax({
+            cache: false,
+            url: '/customer/SubmitCountForOffer',
+            data: {
+                ProductId: $("#CounterOfferProductId").val(),
+                Price: $("#CounterOfferProductPricebx").val(),
+                MessageToSeller: $("#CounterOfferProductNotesbx").val(),
+            },
+            type: 'post',
+            success: function (result) {
+         //       $("#CountOffersTable").find('tr[data-id="'+ $("#CounterOfferProductId").val() +'"]').remove();
+                $("#CounterOfferProductId, #CounterOfferProductPricebx,#CounterOfferProductNotesbx").val('');
+                $('.ui-dialog-titlebar-close').trigger('click');
+                alert("Offer countered successfully");
+                location.reload();
+
+               
+            }
+        });
+    }
+
+    function AcceptOffer(Id)
+    {
+        $.ajax({
+            cache: false,
+            url: '/customer/AcceptOffer',
+            data: {
+                ProductId: Id
+            },
+            type: 'post',
+            success: function (result) {
+               // $("#CountOffersTable").find('tr[data-id="'+ Id +'"]').remove();
+                alert("Offer accepted");
+                location.reload();
+               
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,175 @@
+﻿@model ShoppingCartModel
+@using Nop.Web.Models.Checkout
+@using Nop.Web.Models.ShoppingCart;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.ShoppingCart").Text);
+}
+<div class="breadcrumb-view">
+    <div class="container">
+        <div class="panel-heading">
+            <h3>@T("ShoppingCart")</h3>
+        </div>
+    </div>
+</div>
+@if (!Model.OnePageCheckoutEnabled)
+{
+    @Html.Action("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Cart })
+}
+else
+{
+    <div class="container">
+        <div class="row">
+
+            <!-- <img src="~/Themes/BSNopFlaty/Content/services.png" />-->
+            <!-- Rectangle Banners -->
+            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+                <div class="rec-banner active_position ">
+                    <div class="banner pull-text-center">
+                        <h4>
+                            <a>
+                                <div><i class="fa fa-shopping-cart fa-2x"></i></div>@T("Checkout.Progress.Cart")
+                            </a>
+                        </h4>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+                <div class="rec-banner deactive_position">
+
+
+                    <div class="banner pull-text-center">
+
+                        <h4><a><div><i class="fa fa-map-marker fa-2x"></i></div>@T("Checkout.Progress.Address")</a></h4>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+                <div class="rec-banner deactive_position">
+
+                    <div class="banner pull-text-center">
+
+                        <h4><a><div><i class="fa fa-truck fa-2x"></i></div>@T("Checkout.Progress.Shipping")</a></h4>
+                        <p></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+                <div class="rec-banner deactive_position">
+
+                    <div class="banner pull-text-center">
+
+                        <h4><a><div><i class="fa fa-credit-card fa-2x"></i></div>@T("Checkout.Progress.Payment")</a></h4>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+                <div class="rec-banner deactive_position">
+
+                    <div class="banner pull-text-center">
+
+                        <h4><a><div><i class="fa fa-thumbs-up fa-2x"></i></div>@T("Checkout.Progress.Confirm")</a></h4>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+                <div class="rec-banner deactive_position">
+
+                    <div class="banner pull-text-center">
+
+                        <h4><a><div><i class="fa fa-check fa-2x"></i></div>@T("Checkout.Progress.Complete")</a></h4>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <!-- end: Rectangle Banners -->
+        </div>
+        <br />
+    </div>
+}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default form-panel">
+
+                <div id="order-summary-div" class="panel-body">
+                    @Html.Partial("OrderSummary", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4"><!--<h1>QWE</h1>--></div>
+        <div class="col-lg-4"><!--<h1>ASD</h1>--></div>
+        <div class="col-lg-4"><div id="fb-root"></div></div>
+    </div>
+
+</div>
+
+<!-- Load Facebook SDK for JavaScript -->
+<!--<div id="fb-root"></div>-->
+<script>
+    window.fbAsyncInit = function () {
+        FB.init({
+            xfbml: true,
+            version: 'v6.0'
+        });
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id
+            = id;
+        js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js'
+            ;;
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+<!-- Your customer chat code -->
+<div class="fb-customerchat"
+     attribution=setup_tool
+     page_id="363378203852147">
+</div>
+
+<script src="~/Themes/everything/Content/dependencies/popper.js/popper.min.js"></script>
+@*<script src="~/Themes/everything/Content/dependencies/jquery/jquery.min.js"></script>*@
+<script src="~/Themes/everything/Content/dependencies/bootstrap/js/bootstrap.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/swiper/js/swiper.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/jquery.appear/jquery.appear.js"></script>
+<script src="~/Themes/everything/Content/dependencies/wow/js/wow.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/countUp.js/countUp.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/imagesloaded/imagesloaded.pkgd.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/jquery.parallax-scroll/js/jquery.parallax-scroll.js"></script>
+<script src="~/Themes/everything/Content/dependencies/magnific-popup/js/jquery.magnific-popup.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/gmap3/js/gmap3.min.js"></script>
+<script src="~/Themes/everything/Content/dependencies/googleapi.js"></script>
+<script src="~/Themes/everything/Content/dependencies/js/header.js"></script>
+<script src="~/Themes/everything/Content/dependencies/js/app.js"></script>
+<!-- facebook messenger plugin-->

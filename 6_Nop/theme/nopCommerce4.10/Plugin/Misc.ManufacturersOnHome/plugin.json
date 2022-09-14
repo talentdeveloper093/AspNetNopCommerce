@@ -1,0 +1,15 @@
+﻿{
+  "Group": "Misc",
+  "FriendlyName": "All ManufacturersOnHome",
+  "SystemName": "Misc.ManufacturersOnHome",
+  "Version": "1.80",
+  "SupportedVersions": [
+    "4.10"
+  ],
+  "Author": "team",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Misc.ManufacturersOnHome.dll",
+  "Description": "This plugin allows you to show all manufacturers on home",
+  "LimitedToStores": [],
+  "LimitedToCustomerRoles": []
+}

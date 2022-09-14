@@ -1,0 +1,63 @@
+.magnifyarea {
+	box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+	-webkit-box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+	-moz-box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+	filter: progid:DXImageTransform.Microsoft.dropShadow(color=#dddddd, offX=5, offY=5, positive=true);
+	background: white;
+}
+.targetarea {
+	width: 100%; 
+	height: auto; 
+	margin-top:3px;
+}
+#two {
+	height: 243px; 
+}
+.targetarea img {
+	margin: auto; 
+	display: block; 
+	position: relative;
+	border-width: 0;
+}
+.thumbs { 
+	padding-top: 5px;	
+	text-align: center;
+}
+.thumbs a { 
+	text-decoration: none;
+}
+.thumbs img {
+	border-width: 0;
+}
+.product-thumb.thumbs {
+  width:18%;
+  float:left;
+}
+.product-thumb.thumbs img {
+  max-width:100%;
+   height:70px;
+}
+.gallery .picture:before {
+  padding-top:0px;
+}
+.image-box img {
+    width: auto !important;
+    max-width: 100%;
+    height: auto !important;
+    max-height: 100%;
+    left:0px;
+    right:0px;
+    top:0px !important;
+    bottom:0px;
+    margin:auto;
+    position:absolute;
+}
+.image-box {
+   min-height:420px;
+   text-align: center;
+   vertical-align:middle;
+   position:relative;
+}
+.gallery {
+   border:1px solid #ddd;
+}

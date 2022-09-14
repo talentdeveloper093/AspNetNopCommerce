@@ -1,0 +1,13 @@
+.google-btn {
+    display: inline-block;
+    width: 191px;
+    height: 46px;
+    background-image: url('images/google-signing.png');
+    background-repeat: no-repeat;
+}
+    .google-btn:hover {
+        background-position: 0px -46px;
+    }
+    .google-btn:active {
+        background-position: 0px -92px;
+    }

@@ -1,0 +1,67 @@
+﻿@model TopMenuModel
+<div id="masthead" class="site-header">
+    <div class="site-header-main">
+        <div class="site-header-inner">
+            <div class="site-header-menu-wrap">
+                <div id="site-header-menu" class="site-header-menu">
+                    <nav id="site-navigation" class="main-navigation" role="navigation" aria-label="Primary Menu">
+                        <div class="zmb-container zmb-container-primary has-logo logo-position-left zmb-container-sticky">
+                            <div class="zmb-logo">
+                                <div class="header-logo">
+                                    @await Component.InvokeAsync("Logo")
+                                </div>
+                            </div>
+                            <div class="zmb-wrap zmb-primary-wrap zmb-menu-location-primary zmb-is-sticky">
+                                <ul id="menu-main-menu" class="primary-menu zmb-menu">
+                                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
+                                    @if (Model.DisplayHomepageMenuItem)
+                                    {
+                                        <li class="menu-item zanmenu-menu-item"><a class="zmb-item-title" href="@Url.RouteUrl("HomePage")"><i class="fa fa-home fa-fw"></i></a></li>
+                                    }
+                                    @{
+                                        var rootCategories = Model.Categories.Where(x => x.IncludeInTopMenu).ToList();
+                                    }
+                                    @foreach (var category in rootCategories)
+                                    {
+                                        var categoryLineModel = new TopMenuModel.CategoryLineModel
+                                        {
+                                            Category = category
+                                        };
+                                        @await Html.PartialAsync("_CategoryLine.TopMenu", categoryLineModel)
+                                    }
+                                    @foreach (var topic in Model.Topics)
+                                    {
+                                        <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
+                                    }
+                                    @if (rootCategories.Count == 0 && Model.Topics.Count == 0)
+                                    {
+                                        //no categories or topis to display? in this case let's diplay some default menu items (should we?)
+                                        <li class="menu-item zanmenu-menu-item"><a class="zmb-item-title" href="@Url.RouteUrl("HomePage")">@T("HomePage")</a></li>
+                                        if (Model.NewProductsEnabled)
+                                        {
+                                            <li>
+                                                <a href="@Url.RouteUrl("NewProducts")">@T("Products.NewProducts")</a>
+                                            </li>
+                                        }
+                                        <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a></li>
+                                        <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
+                                        if (Model.BlogEnabled)
+                                        {
+                                            <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+                                        }
+                                        if (Model.ForumEnabled)
+                                        {
+                                            <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+                                        }
+                                        <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+                                    }
+                                    @await Component.InvokeAsync("Widget", new { widgetZone = "header_menu_after" })
+                                </ul>
+                            </div><!-- /.navbar-collapse -->
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+
+
+@{
+    Layout = "~/Themes/everything/Views/Shared/_ColumnsTwoHomepage.cshtml";
+}
+       @*@Html.Action("TopicBlock", "Topic", new { systemName = "HomePageText" })*@
+        @Html.Action("HomepageCategories", "Catalog")
+        @Html.Action("HomepageProducts", "Product")
+       <div class="container-fluid">
+          <div class="row">
+             <img src="~/Themes/everything/Content/images/adv-banners.jpg" class="img-responsive" />
+          </div>  
+        </div>
+        <div class="container">
+        <div class="row">
+        <div class="col-sm-6">
+         @Html.Action("NewProducts", "Product")
+        </div>
+       <div class="col-sm-6">
+                @Html.Action("HomepageBestSellers", "Product")
+         </div>
+        </div>
+        </div>
+        @Html.Action("HomePageNews", "News")
+        @Html.Action("ManufacturerAll", "Catalog")
+        @*@Html.Action("HomePagePolls", "Poll")*@
+        @Html.Widget("home_page_bottom")
+
+      
+      
+     
+
+      
+    
+
+
+  

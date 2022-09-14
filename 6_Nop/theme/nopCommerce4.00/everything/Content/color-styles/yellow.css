@@ -1,0 +1,248 @@
+﻿.topbar.navbar-default .navbar-nav > li > a:hover, .topbar.navbar-default .navbar-nav > li > a:active, .topbar.navbar-default .navbar-nav > li > a:focus {   
+    color: #c7b299 !important;
+}
+.masthead {
+    
+}
+a.logo{
+   color: #c7b299;
+}
+.zmb-wrap .zmb-menu > li:hover > a {
+    color:#c7b299;
+}
+.topcart:hover{
+    background: #ddd; 
+}
+.theme-custom .nivo-controlNav a{
+    background:#242424 !important;
+}
+.theme-custom .nivo-controlNav a.active {
+   background:#c7b299 !important;
+}
+.title-carousel-control:hover{
+    background:#c7b299;
+    color:#fff;
+    border-color:#c7b299;
+    outline:none;
+}
+.newsletter-email input[type="button"] {
+    background:#c7b299;
+    border: 2px solid #c7b299;
+}
+.newsletter-email input[type="button"]:hover {
+   background:#242424;
+   border: 2px solid #242424; 
+}
+.masthead .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+  background:#D6D6D6;
+  color:#444;
+}
+.mid-content-title h2::after{
+    background:#c7b299;
+}
+footer h3::after{
+    background:#c1c1c1;
+}
+footer a:hover{
+    color:#c7b299;
+}
+footer a:hover::before{
+    width:100%;
+    background:#c7b299;
+}
+.scrollup {
+   border: 1px solid #c7b299;
+}
+.scrollup:hover {
+   border: 1px solid #9e886e;
+}
+.scrollup i{
+    background:#c7b299;
+}
+.scrollup:hover i{
+    background:#9e886e;
+}
+.breadcrumb a{
+    color:#c7b299;
+}
+.breadcrumb a:hover, .breadcrumb a:active{
+    color:#242424;
+    text-decoration:none;   
+}
+.contactInfo i{
+    color: #c7b299;
+}
+.contactInfo li:hover i {      
+   color:#c7b299;
+}
+.Addcart{
+    background: #c7b299;
+}
+.product-box-detail-button, .wish-btn{
+    background: #666;
+}
+.Addcart:hover, .product-box-detail-button:hover, .wish-btn:hover{
+    background: #9b7447;
+}
+.product-details-page .nav-tabs>li.active>a, .product-details-page .nav-tabs>li.active>a:hover, .product-details-page .nav-tabs>li.active>a:focus{
+    border-bottom: 1px solid #c7b299 !important;
+    background: #c7b299;
+    border-radius: 0px;
+    color: #fff !important;
+}
+/**************************************
+      button class
+    ***************************************/
+
+.btn-default, .buttons .btn-default{
+    color: #fff;
+    background:#c7b299;
+    border:2px solid #c7b299;
+}
+.btn-default:hover, .buttons .btn-default:hover { 
+    color: #fff;
+    border:2px solid #444;
+    background:#444;  
+}
+.view-all .btn { 
+    border:2px solid #c7b299;
+    background:#c7b299;
+    margin:10px 0px 0px 0px;
+    color:#fff;
+}
+.view-all .btn:hover { 
+    border:2px solid #000;
+    background:#242424;
+    color:#fff;
+}
+.btn-primary, .login .btn-default {
+   background-color: #c7b299;
+   border-color: #c7b299;  
+}
+.btn-primary:hover, .login .btn-default:hover{
+   background-color: #242424;
+   border-color: #242424;
+   color:#fff;
+}
+.common-buttons .btn.btn-default:nth-child(2n+1) {
+    background: #c7b299;
+    border: 2px solid #c7b299;
+}
+.common-buttons .btn.btn-default:hover{  
+   background: #333;
+   border: 2px solid #333;
+   color:#fff;
+}
+.coupon-box .btn-default, .giftcard-box .btn-default, .compare .btn-default{
+    color: #fff;
+    background:#c7b299;
+    border:2px solid #c7b299;
+}
+.coupon-box .btn-default:hover, .giftcard-box .btn-default:hover, .compare .btn-default:hover { 
+    color: #fff;
+    border:2px solid #444;
+    background:#444;  
+}
+.checkout-buttons .btn-default{
+    border:2px solid #c7b299;
+    color: #444;
+}
+.checkout-buttons .btn-default:hover{
+    border:2px solid #c7b299;
+    background:#c7b299;
+    color: #fff;
+}
+.add-to-cart-button {
+     background:#c7b299 !important;
+     border:2px solid #c7b299 !important;
+}
+.add-to-cart-button:hover {
+     background:#242424 !important;
+     border:2px solid #242424 !important;
+}
+.add-to-wishlist-button {
+    display: block;
+    margin-top: 10px;
+}
+.wishlist-btn, .emailCompare-btn {
+    display: inline-block;
+    margin-right: 4px;
+    float: left;
+}
+.wishlist-btn .btn.btn-default, .emailCompare-btn .btn.btn-default {
+    background: #333;
+    border: 2px solid #333;
+    color: #fff;
+}
+.wishlist-btn .btn.btn-default:hover, .emailCompare-btn .btn.btn-default:hover {
+    color: #fff;
+    background: #c7b299;
+    border-color: #c7b299;
+}
+.add-button .btn-default {
+   background:#444;
+   border-color:#444;
+}
+.add-button .btn-default:hover {
+   background:#000;
+   border-color:#000;
+   color:#fff;
+}
+.side-nav h3 span::before{
+    background: #c7b299;
+}
+.side-nav-gbtbox ul li::before{
+    background:#c7b299; 
+}
+.side-nav-block ul li a:hover, .side-nav-block ul li:hover a, .side-nav-block ul li a:active, .side-nav-block ul li a:focus {
+   color:#c7b299;
+ }
+.product-list .add-info .new-prices{
+    color:#c7b299;
+}
+.read-more{
+    color: #03aab7;
+}
+.op-number{
+    background: #c7b299;
+}
+/***************************************
+    Checkout page
+    *****************************************/
+.opc .active .step-title{
+    background-color: #d0d0d0 !important;
+    border: 1px solid #d0d0d0 !important;
+    color: #242424;
+}
+.opc .active .step-title .number {
+    background: #B20405;
+    border-color: #B20405;
+    color: #fff;
+}
+.tags > a:hover {
+    background:#c7b299;
+    border: 1px solid #c7b299 !important;
+    color:#fff;
+}
+.sitemap a:hover{
+    color:#c7b299;
+}
+.sitemap a:hover::before{
+   width:100%;
+   background: #c7b299;
+}
+/*******************************
+      Mega Menu
+**********************************/
+.zmb-wrap .zmb-menu > li .sub-menu li li a::after {
+    background:#c7b299;
+}
+.zmb-clone-wrap > .zmb-panels > .zmb-panel .zmb-menu > .menu-item > a:hover, .zmb-clone-wrap > .zmb-panels > .zmb-panel .sub-menu > .menu-item > a:hover {
+    color: #c7b299;
+}
+.zmb-wrap .zmb-menu > li .sub-menu ul > li > a:hover, .zmb-panel .sub-menu > .menu-item > a:hover {
+    color:#c7b299;
+}
+.zmb-wrap .zmb-menu > li .sub-menu li li a:hover, .zmb-panels .sub-menu .zanmenu-content ul > li li a:hover {
+    color:#c7b299;
+}

@@ -1,0 +1,85 @@
+﻿@model IList<AddressAttributeModel>
+@using Nop.Core.Domain.Catalog;
+@foreach (var attribute in Model)
+{
+    var controlId = $"address_attribute_{attribute.Id}";
+    var textPrompt = attribute.Name;
+
+    <div class="form-group row">
+        <label class="col-form-label col-sm-12 col-md-3 col-lg-3 col-xl-3 col-form-label pl-0 pr-0 pt-0">@textPrompt</label>
+        <div class="col-sm-12 col-md-5 col-lg-5 col-xl-5">
+            @switch (attribute.AttributeControlType)
+            {
+                case AttributeControlType.DropdownList:
+                    {
+                        <select name="@(controlId)" id="@(controlId)" class="form-control custom-select">
+                            @if (!attribute.IsRequired)
+                            {
+                                <option value="0">---</option>
+                            }
+                            @foreach (var attributeValue in attribute.Values)
+                            {
+                                <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
+                            }
+                        </select>
+                    }
+                    break;
+                case AttributeControlType.RadioList:
+                    {
+                        <ul class="option-list">
+                            @foreach (var attributeValue in attribute.Values)
+                            {
+                                <li>
+                                    <div class="custom-control custom-radio">
+                                        <input class="custom-control-input" id="@(controlId)_@(attributeValue.Id)" type="radio" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
+                                        <label class="custom-control-label" for="@(controlId)_@(attributeValue.Id)">@attributeValue.Name</label>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    break;
+                case AttributeControlType.Checkboxes:
+                case AttributeControlType.ReadonlyCheckboxes:
+                    {
+                        <ul class="option-list">
+                            @foreach (var attributeValue in attribute.Values)
+                            {
+                                <li>
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" @(attribute.AttributeControlType == AttributeControlType.ReadonlyCheckboxes ? Html.Raw(" disabled=\"disabled\"") : null) />
+                                        <label class="custom-control-label" for="@(controlId)_@(attributeValue.Id)">@attributeValue.Name</label>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    break;
+                case AttributeControlType.TextBox:
+                    {
+                        <input name="@(controlId)" type="text" class="textbox form-control" id="@(controlId)" value="@attribute.DefaultValue" />
+                    }
+                    break;
+                case AttributeControlType.MultilineTextbox:
+                    {
+                        <textarea class="form-control" cols="20" id="@(controlId)" name="@(controlId)">@attribute.DefaultValue</textarea>
+                    }
+                    break;
+                case AttributeControlType.Datepicker:
+                case AttributeControlType.FileUpload:
+                case AttributeControlType.ColorSquares:
+                case AttributeControlType.ImageSquares:
+                    {
+                        //not support attribute type
+                    }
+                    break;
+            }
+        </div>
+        <div class="col-sm-12 col-md-4 col-lg-4 col-xl-3 required-error">
+            @if (attribute.IsRequired)
+            {
+                <strong class="d-none d-md-block d-lg-block d-xl-block"><nop-required /></strong>
+            }
+        </div>
+    </div>
+}

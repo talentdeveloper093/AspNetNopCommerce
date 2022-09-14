@@ -1,0 +1,179 @@
+﻿@model TopMenuModel
+@using System.Text.RegularExpressions
+@using Nop.Web.Models.Catalog;
+@{
+    var isRtl = this.ShouldUseRtlTheme();
+}
+@{   
+    Html.AddScriptParts("~/Themes/everything/Scripts/frontend.js");
+    Html.AddScriptParts("~/Themes/everything/Scripts/effect-nav.js");
+}
+@helper Bracket_Remover(string input)
+{
+    int index1 = input.IndexOf('(');
+    string result = input.Remove(index1, 1);
+
+    index1 = result.IndexOf(')');
+    result = result.Remove(index1, 1);
+
+    @Html.Raw(@result)
+}
+
+@helper RenderSubCategoryLine(CategorySimpleModel category, int level)
+{
+    <li class="menu-item zanmenu-menu-item dropdown menu-item-has-children">
+        <a class="zmb-item-title zmb-dropdown-toggle" data-title="Mega Menu" data-toggle="dropdown" href="#">
+            @category.Name
+            <i class="fa fa-angle-down"></i>
+        </a>
+        <div class="sub-menu zanmenu">
+            <div class="zmb-posts-list-wrap zan-posts-list-wrap wow fadeInUp post-list-style_2 " data-wow-delay="0.4s">
+                <div class="zanmenu-content ">
+                    <ul>
+                        @foreach (var subCategory in category.SubCategories)
+                        {
+                            <li>
+                                <a class="widgettitle zmb-heading" href="@Url.RouteUrl("Category", new { SeName = @subCategory.SeName })">@subCategory.Name</a>
+                                <ul>
+                                    @foreach (var step3 in subCategory.SubCategories)
+                                    {
+                                        <li>
+                                            <a href="@Url.RouteUrl("Category", new { SeName = @step3.SeName })">
+                                            <i class="fa fa-caret-right" aria-hidden="true"></i> @step3.Name</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                    </ul>                    
+                </div>
+             </div>
+        </div>
+    </li>
+}
+@helper RenderCategoryLine(CategorySimpleModel category, int level)
+{
+    if (category.SubCategories.Count > 0)
+    {
+        @RenderSubCategoryLine(category, 0)
+    }
+    else
+    {
+        <li class="menu-item zanmenu-menu-item">
+            <a class="zmb-item-title" href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
+                @category.Name
+            </a>
+        </li>
+    }
+}
+<div id="masthead" class="site-header">
+<div class="site-header-main">
+<div class="site-header-inner">
+<div class="site-header-menu-wrap">
+<div id="site-header-menu" class="site-header-menu">
+<nav id="site-navigation" class="main-navigation" role="navigation"
+        aria-label="Primary Menu">
+    <div class="zmb-container zmb-container-primary has-logo logo-position-left zmb-container-sticky">
+        <div class="zmb-logo">
+           @Html.Action("Logo", "Common")
+        </div>                            
+        <div class="zmb-wrap zmb-primary-wrap zmb-menu-location-primary zmb-is-sticky">
+            <ul id="menu-main-menu" class="primary-menu zmb-menu">
+                @Html.Widget("header_menu_before")
+                <li class="menu-item zanmenu-menu-item"><a class="zmb-item-title " href="@Url.RouteUrl("HomePage")"><span class="glyphicon glyphicon-home"></span></a></li>
+                @{
+                    var rootCategories = Model.Categories.Where(x => x.IncludeInTopMenu).ToList();
+                }
+                @foreach (var category in rootCategories)
+                {
+                    @RenderCategoryLine(category, 0)
+                }
+
+                @foreach (var topic in Model.Topics)
+                {
+                    <li><a href="@Url.RouteUrl("Topic", new {SeName = topic.SeName})">@topic.Name</a></li>
+
+                }
+                @if (Model.Categories.Count == 0 && Model.Topics.Count == 0)
+                {
+                    //no categories to display?
+                    //in this cae let's diplay some default menu items
+                    <li><a href="@Url.RouteUrl("HomePage")">@T("HomePage")</a></li>
+                    if (Model.NewProductsEnabled)
+                    {
+                        <li>
+                            <a href="@Url.RouteUrl("NewProducts")">@T("Products.NewProducts")</a>
+                        </li>
+                    }
+                    <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a> </li>
+                    <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
+                    if (Model.BlogEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+                    }
+                    if (Model.ForumEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+                    }
+                    <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+                }
+                @Html.Widget("header_menu_after")                                 
+            </ul>
+        </div><!--/.nav-collapse -->
+                            
+    </div>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+$(document).ready(function () {
+    $(".navbar-toggle").click(function () {
+        $(this).parent().find("> .navbar-header").css("overflow-y", "auto");
+    });
+    $(".searchbtn").click(function () {
+        $(".search-box").toggleClass("search-display");
+    });
+});
+</script>
+<script type="text/javascript">
+$(function () {
+    // Call stylesheet init so that all stylesheet changing functions
+    // will work.
+    $.stylesheetInit();
+    // This code loops through the stylesheets when you click the link with
+    // an ID of "toggler" below.
+    $('#toggler').bind(
+        'click',
+        function (e) {
+            $.stylesheetToggle();
+            return false;
+        }
+    );
+    // When one of the styleswitch links is clicked then switch the stylesheet to
+    // the one matching the value of that links rel attribute.
+    $('.styleswitch').bind(
+        'click',
+        function (e) {
+            $.stylesheetSwitch(this.getAttribute('rel'));
+            return false;
+        }
+    );
+    $("#configure-button").on("click", function (e) {
+        e.preventDefault();
+        if ($(this).data("expanded") == "true") {
+            $("#color-options").css({ right: '-180px' });
+            $("#configure-button").css({ right: '0px' });
+            $(this).data("expanded", "false");
+        } else {
+            $("#color-options").css({ right: '0px' });
+            $("#configure-button").css({ right: '180px' });
+            $(this).data("expanded", "true");
+        }
+    });
+
+});
+</script>                
+

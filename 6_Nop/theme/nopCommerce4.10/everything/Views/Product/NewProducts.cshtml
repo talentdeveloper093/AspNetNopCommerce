@@ -1,0 +1,32 @@
+﻿@model IList<ProductOverviewModel>
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.NewProducts").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-recently-added-products-page");
+}
+<div class="page recently-added-products-page">
+    <div class="title mid-content-title">
+        <a href="@Url.RouteUrl("NewProductsRSS")" class="link-rss float-right" title="@T("Products.NewProducts.RSS.Hint")"><i class="fa fa-rss-square" aria-hidden="true"></i></a>
+        <h3 class="d-inline-block mb-0">@T("Products.NewProducts")</h3>
+    </div>
+    <div class="page-body">
+        <div class="item-grid">
+            @if (Model.Count > 0)
+            {
+                <div class="row">
+                    @foreach (var product in Model)
+                    {
+                        <div class="item-box product-grid col-sm-6 col-md-4 col-lg-4">
+                          <div class="offer offer-default">
+                           @await Html.PartialAsync("_ProductBox", product)
+                        </div>
+                       </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

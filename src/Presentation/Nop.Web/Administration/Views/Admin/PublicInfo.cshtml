@@ -1,0 +1,17 @@
+﻿@{
+    Layout = "";
+    Html.AddCssFileParts("~/Plugins/ExternalAuth.ExtendedAuth/Content/styles.css");
+}
+<div class="ExtendedAuthentication">
+    <div class="social">
+        <ul class="networks">
+            @foreach (var externalAuth in ViewBag.externalAuths)
+            {
+                <li>
+                    <a asp-controller="authentication" asp-action="login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" asp-route-authentication="@externalAuth" class="exoauth_btn @externalAuth.ToLower()-btn"></a>
+                </li>
+            }           
+        </ul>
+    </div>
+</div>
+

@@ -1,0 +1,984 @@
+﻿@model ShoppingCartModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Infrastructure
+@using Nop.Web.Models.ShoppingCart;
+@using Nop.Core.Domain.Customers;
+@using Nop.Web.Models.Common;
+
+@{
+    
+    //var test = CustomerExtensions.IsRegistered(,);
+    //var userisAuthenticated = Model.CustomProperties
+    var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+<script>
+    $(document).ready(function () {
+        $("#btn_continue").click(function () {
+            var a = $('input#txt_usermail').val();
+            $('label#lbl_GetUserEmail').html(a); // txt_usermail, lbl_GetUserEmail
+        });
+    });
+</script>
+<script type="text/javascript">
+    function getOption() {
+        selectElement = document.querySelector('#select1');
+
+        output =
+            selectElement.options[selectElement.selectedIndex].value;
+
+        document.querySelector('.output').textContent = output;
+    }
+</script>
+
+<script>
+    function removebuttonclicked(itemid) {
+        var theWholeForm = document.getElementById("div_checkout");
+        var emptyCartDisplay = document.getElementById("div_empty_msg");
+        var elementToRemove = document.getElementById("item-id-" + itemid);
+        var removeCheckBox = document.getElementById("remove-checkbox-" + itemid);
+        removeCheckBox.checked = true;
+        elementToRemove.classList.toggle("visible-item-in-cart")
+        var remainingVisible = document.getElementsByClassName("visible-item-in-cart");
+        if (remainingVisible.length == 0) {
+            theWholeForm.style.display = "none";
+            emptyCartDisplay.style.display = "block";
+        }
+        document.getElementById("update-cart-button").click();
+    };
+</script>
+
+<style>
+    .cc-selector input {
+        margin: 0;
+        padding: 0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+        .cc-selector input:active + .drinkcard-cc {
+            opacity: .9;
+        }
+
+        .cc-selector input:checked + .drinkcard-cc {
+            -webkit-filter: none;
+            -moz-filter: none;
+            filter: none;
+        }
+
+    .drinkcard-cc {
+        cursor: pointer;
+        background-size: contain;
+        background-repeat: no-repeat;
+        display: inline-block;
+        width: 100px;
+        height: 70px;
+        -webkit-transition: all 100ms ease-in;
+        -moz-transition: all 100ms ease-in;
+        transition: all 100ms ease-in;
+        -webkit-filter: brightness(1.8) grayscale(1) opacity(.7);
+        -moz-filter: brightness(1.8) grayscale(1) opacity(.7);
+        filter: brightness(1.8) grayscale(1) opacity(.7);
+    }
+
+        .drinkcard-cc:hover {
+            -webkit-filter: brightness(1.2) grayscale(.5) opacity(.9);
+            -moz-filter: brightness(1.2) grayscale(.5) opacity(.9);
+            filter: brightness(1.2) grayscale(.5) opacity(.9);
+        }
+
+    /* Extras */
+    a:visited {
+        color: #888
+    }
+
+    a {
+        color: #444;
+        text-decoration: none;
+    }
+
+    p {
+        margin-bottom: .3em;
+    }
+
+    .btn_savenremove {
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+        .btn_savenremove:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="order-summary-content">
+    @Html.Widget("order_summary_content_before")
+    @Html.Partial("_OrderReviewData", Model.OrderReviewData)
+    @if (Model.Items.Count > 0)
+    {
+        if (Model.Warnings.Count > 0)
+        {
+            <div class="message-error">
+                <ul>
+                    @foreach (var warning in Model.Warnings)
+                    {
+                        <li>@warning</li>
+                    }
+                </ul>
+            </div>
+        }
+        @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
+        using (Html.BeginRouteForm("ShoppingCart", FormMethod.Post, new { enctype = "multipart/form-data", id = "shopping-cart-form" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="table-wrapper table-responsive">
+                @*<table class="cart table table-bordered">
+                    <colgroup>
+                        @if (Model.IsEditable)
+                        {
+                            <col width="1" />
+                        }
+                        @if (Model.ShowSku)
+                        {
+                            <col width="1" />
+                        }
+                        @if (Model.ShowProductImages)
+                        {
+                            <col width="1" />
+                        }
+                        <col />
+                        <col width="1" />
+                        <col width="1" />
+                        <col width="1" />
+                    </colgroup>*@
+                <div class="row" id="div_empty_msg" style="display:none">
+                    <div class="col-lg-12">
+                        <label>Your Shopping Cart is empty!</label>
+                    </div>
+                </div>
+
+                <div class="row" id="div_checkout">
+                    <div class="col-lg-9" style="border:1px solid #ddd;height:100%;border-top-left-radius:5px;border-bottom-left-radius:5px">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div id="item-id-@item.Id" class="visible-item-in-cart">
+                                @*if (Model.IsEditable)
+                                    {
+
+                                        if (item.DisableRemoval)
+                                        {
+                                            <text>&nbsp;</text>
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" name="removefromcart" value="@(item.Id)" />
+                                        }
+
+                                    }*@
+                                @*if (Model.ShowSku)
+                                    {
+
+                                        <span class="sku-number">@item.Sku</span>
+
+                                    }*@
+                                @if (Model.ShowProductImages)
+                                {
+
+                                    <div class="row" style="padding:20px">
+                                        <!--Remove Checkbox-->
+                                        @if (item.DisableRemoval)
+                                        {
+                                            <text>&nbsp;</text>
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" id="remove-checkbox-@item.Id" name="removefromcart" value="@(item.Id)" style="display:none" />
+                                        }
+                                        <!--Product Image-->
+                                        <div class="col-lg-4" style="border:1px solid #ddd;border-radius:5px">
+                                            <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })"><img style="width:200px;height:200px;text-align:center" alt="@item.Picture.AlternateText" src="@item.Picture.ImageUrl" title="@item.Picture.Title" /></a>
+                                        </div>
+                                        <!--Product Name-->
+                                        <div class="col-lg-4">
+                                            <a style="font-size:18px" href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>
+                                            <br />
+                                            <br />
+                                            <h5 style="text-align:right;color:orangered">Only 1 available</h5>
+                                            <br />
+                                            <a href="#" class="btn_savenremove" name="removefromcart" value="@(item.Id)" style="padding-right:20px">Save for later</a><a href="#" class="btn_savenremove" onclick="removebuttonclicked('@item.Id.ToString()')">Remove</a>
+                                        </div>
+
+                                        <div class="col-lg-2">
+                                            <!--Product Quantity-->
+                                            @if (Model.IsEditable)
+                                            {
+                                                if (item.AllowedQuantities.Count > 0)
+                                                {
+                                                    <select name="itemquantity@(item.Id)" class="qty-dropdown">
+                                                        @foreach (var qty in item.AllowedQuantities)
+                                                        {
+                                                            <option selected="@qty.Selected" value="@qty.Value">@qty.Value</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <input name="itemquantity@(item.Id)" type="text" value="@(item.Quantity)" class="qty-input form-control" />
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                <span class="product-quantity">@item.Quantity</span>
+                                            }
+                                        </div>
+                                        <h5><a href="#" data-toggle="modal" data-target="#myModal">Contact Shop</a></h5>
+                                        <div class="col-lg-2">
+                                            <span class="product-unit-price" style="font-size:20px;font-weight:bold">@item.UnitPrice</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4"></div>
+                                        <div class="col-lg-4"></div>
+                                        <div class="col-lg-4"></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-7"></div>
+                                        <div class="col-lg-5">
+                                            <select class="form-control" id="select1" onclick="getOption()">
+                                                <option value="14.54">USD 14.54 (USPS First Class International Package Service)</option>
+                                                <option value="50.83">USD 50.83 (Mar 17 - 24, USPS Priority Mail International)</option>
+                                                <option value="65.86">USD 65.86 (Mar 12 - 17, USPS Priority Mail Express International)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <br />
+                                }
+
+                                @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                                {
+                                    <div class="attributes">
+                                        @Html.Raw(item.AttributeInfo)
+                                    </div>
+                                }
+                                @*if (!String.IsNullOrEmpty(item.RecurringInfo))
+                                    {
+                                        <div class="recurring-info">
+                                            @Html.Raw(item.RecurringInfo)
+                                        </div>
+                                    }*@
+                                @if (!String.IsNullOrEmpty(item.RentalInfo))
+                                {
+                                    <div class="rental-info">
+                                        @Html.Raw(item.RentalInfo)
+                                    </div>
+                                }
+                                @if (Model.IsEditable && item.AllowItemEditing)
+                                {
+                                    var editCartItemUrl = Url.RouteUrl("Product", new { SeName = item.ProductSeName });
+                                    editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid=" + item.Id, null);
+                                    <div class="edit-item">
+                                        <a class="btn btn-default" href="@editCartItemUrl">@T("Common.Edit")</a>
+                                    </div>
+                                }
+                                @if (item.Warnings.Count > 0)
+                                {
+                                    <div class="message-error">
+                                        <ul>
+                                            @foreach (var warning in item.Warnings)
+                                            {
+                                                <li>@warning</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+
+
+                                @*<span class="product-unit-price">@item.UnitPrice</span>*@
+
+
+                                @*if (Model.IsEditable)
+                                    {
+                                        if (item.AllowedQuantities.Count > 0)
+                                        {
+                                            <select name="itemquantity@(item.Id)" class="qty-dropdown">
+                                                @foreach (var qty in item.AllowedQuantities)
+                                                {
+                                                    <option selected="@qty.Selected" value="@qty.Value">@qty.Value</option>
+                                                }
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <input name="itemquantity@(item.Id)" type="text" value="@(item.Quantity)" class="qty-input form-control" />
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <span class="product-quantity">@item.Quantity</span>
+                                    }*@
+
+                                <!--Total Amount-->
+                                @*<span class="product-subtotal">@item.SubTotal</span>*@
+                                @*if (!String.IsNullOrEmpty(item.Discount))
+                                    {
+                                        <div class="discount">
+                                            @T("ShoppingCart.ItemYouSave", item.Discount)
+                                        </div>
+                                        if (item.MaximumDiscountedQty.HasValue)
+                                        {
+                                            <div class="discount-additional-info">
+                                                @T("ShoppingCart.MaximumDiscountedQty", item.MaximumDiscountedQty.Value)
+                                            </div>
+                                        }
+                                    }*@
+
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-lg-3" style="border:1px solid #ddd;height:auto;border-top-right-radius:5px;border-bottom-left-radius:5px;border-bottom-right-radius:5px">
+                        <!--Checkout Div Start-->
+                        <div>
+                            <br />
+                            <!--Payment Method Icons Start-->
+                            <h5>How you'll pay</h5>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <form>
+                                        <div>
+                                            <input id="a1" type="radio" name="a" value="visa" />
+                                            <label for="a1"><img src="https://pngimg.com/uploads/mastercard/mastercard_PNG25.png" style="width:50px;height:50px;" /> <img src="https://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Visa-icon.png" style="width:50px;height:50px;" /> <img src="https://icons-for-free.com/iconfiles/png/512/express+amex+charge+credit+card+payment+icon-1320162794613674570.png" style="width:50px;height:50px;border:1px solid #ddd;border-radius:5px" /></label><br />
+                                            <input id="a2" type="radio" name="a" value="mastercard" />
+                                            <label for="a2"><img src="https://pngimg.com/uploads/paypal/paypal_PNG22.png" style="width:50px;height:40px;border:1px solid #ddd;border-radius:5px" /></label>
+                                            <input id="a3" type="radio" name="a" value="cashapp" />
+                                            <label for="a3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Square_Cash_app_logo.svg/1200px-Square_Cash_app_logo.svg.png" style="width:50px;height:40px;border:1px solid #ddd;border-radius:5px" /></label>
+                                            <input id="a4" type="radio" name="a" value="bitcoint" />
+                                            <label for="a4"><img src="https://1000logos.net/wp-content/uploads/2018/04/Emblem-Bitcoin.jpg" style="width:50px;height:40px;border:1px solid #ddd;border-radius:5px" /></label>
+                                            @*<button type="submit">pay</button>*@
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!--Payment Method Icons End-->
+                            <div class="totals total-price">
+                                @Html.Action("OrderTotals", "ShoppingCart", new { isEditable = Model.IsEditable })
+
+                                @if (Model.IsEditable)
+                                {
+                                    if (!String.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
+                                    {
+                                        <div class="min-amount-warning">
+                                            @Model.MinOrderSubtotalWarning
+                                        </div>
+                                    }
+                                }
+                                <div class="row">
+                                    <div class="col-lg-6"><label style="padding-left:8px">Delivery</label></div>
+                                    <div class="col-lg-6"><span class="output" style="float:right;padding-right:2px">14.54</span></div><!--ViewBag.CountryEstimateCost-->
+                                </div>
+
+                                @if (Model.IsEditable)
+                                {
+                                    if (Model.TermsOfServiceOnShoppingCartPage)
+                                    {
+                                        <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
+                                            <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
+                                        </div>
+                                        <div class="terms-of-service">
+                                            <label for="termsofservice">
+                                                <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                                @T("Checkout.TermsOfService.IAccept")
+                                                <span><a class="read" id="read-terms">@T("Checkout.TermsOfService.Read")</a></span>
+                                            </label>
+                                            <script>
+                                        $(document).ready(function () {
+                                            $('#read-terms').on('click', function (e) {
+                                                e.preventDefault();
+                                                displayPopupContentFromUrl('@Url.RouteUrl("TopicPopup", new {SystemName = "conditionsofuse"})', '@T("Checkout.TermsOfService")');
+                                            });
+                                        });
+                                            </script>
+                                        </div>
+                                    }<br />
+                                    <div class="checkout-buttons">
+                                        @if (String.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
+                                        {
+                                            <script type="text/javascript">
+                                                //  $(document).ready(function () {
+                                                // $('#checkout').click(function () {
+                                                //terms of service
+                                                //       var termOfServiceOk = true;
+
+                                                //        if ($('#termsofservice').length > 0) {
+                                                //terms of service element exists
+                                                //         if (!$('#termsofservice').is(':checked')) {
+                                                //              $("#terms-of-service-warning-box").dialog();
+                                                //              termOfServiceOk = false;
+                                                //          } else {
+                                                //              termOfServiceOk = true;
+                                                //         }
+                                                //       }
+                                                //       return termOfServiceOk;
+                                                //   });
+                                                // });
+                                            </script>
+
+                                        }
+                                    </div>
+
+                                    <a href="#" style="color:black;text-decoration:underline" class="anchor_get_shipcost"><i class="fa fa-truck" aria-hidden="true"></i> Get shipping cost</a>
+                                    <br /><br />
+                                    <!--class="button-1 checkout-button btn btn-default"-->
+                                    @*<button type="button" data-toggle="modal" data-target="#myModal" id="checkout" name="checkout" value="checkout" class="btn btn-lg" style="color:white;background-color:black;border-radius:5px;width:100%;height:50px">
+
+                @T("Proceed to Checkout")
+            </button>
+                                        data-toggle="modal" data-target="#checkoutModal"
+                                    *@
+                                    <a id="checkout" name="checkout" class="btn btn-lg" style="color:white;background-color:black;border-radius:5px;width:100%;height:50px">
+
+                                        @T("Proceed to Checkout")
+                                    </a>
+                                    @*<a href="#"  onclick="OpenCheckoutModal()" name="checkout" value="checkout" class="btn btn-lg" style="color:white;background-color:black;border-radius:5px;width:100%;height:50px">
+                Proceed to Checkout
+
+            </a>*@
+                                    <br /><br />
+                                    <div class="addon-buttons">
+                                        @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
+                                        @Html.Partial("_ButtonPaymentMethod", Model)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!--Checkout Div End-->
+                    </div>
+                </div>
+
+
+
+            </div>
+
+
+
+            <!-- Checkout Login Popup Modal Start -->
+            <!-- Trigger the modal with a button -->
+            <!--<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>-->
+            <!-- Modal -->
+            <div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width:70%">
+                        <div class="modal-header">
+                            @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>*@
+                            <h4 class="modal-title" id="myModalLabel">Go to checkout</h4>
+                            <button type="button" id="closeBtn" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <!--<input type="submit" name="btn_as_guest" value="Continue as a guest" style="width:100%;height:50px;font-weight:bold;border-radius:3%" class="btn btn-default" />-->
+                                    <input type="button" style="width:100%;height:50px;font-weight:bold;border-radius:3%;color:black" class="btn btn-default" onclick="location.href='@Url.RouteUrl("Checkout")'" value="@T("Account.Login.CheckoutAsGuest")" />
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <h5 style="text-align: center;border-bottom: 1px solid #000;line-height: 0.1em;width:100%;margin: 10px 0 20px; "><span style="background:#fff;padding:0 10px">OR</span></h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h3 style="text-align:left">Sign in or register</h3>
+                                </div>
+                            </div>
+                            <form action="/login" method="post" novalidate="novalidate">
+                                <div class="row" style="padding-top:15px">
+                                    <div class="col-lg-12">
+                                        <label>Email address</label>
+                                        <br />
+                                        <input id="txt_usermail" name="Email" type="text" class="form-control" style="width:100%;height:50px;" />
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label>Password</label>
+                                        <br />
+                                        <input id="txt_usermail" name="Password" type="password" class="form-control" style="width:100%;height:50px;" />
+                                        <input type="hidden" name="IsCart" value="Yes" />
+                                    </div>
+                                </div>
+
+
+                                <div class="row" style="padding-top:15px">
+                                    <div class="col-lg-12">
+                                        @*data-toggle="modal" data-target="#myModalRegister" data-dismiss="modal" id="btn_continue"*@
+                                        <input type="submit" name="btn_continue" class="btn btn-lg" value="Continue" style="width:100%;height:50px;background-color:black;color:white;border-radius:2%" /><!-- onclick="location.href='@Url.RouteUrl("register")'" -->
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-4"></div>
+                                <div class="col-lg-4">
+                                    <a href="login" style="width:100%;color:darkgrey">Trouble signing in?</a>
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <h5 style="text-align: center;border-bottom: 1px solid #000;line-height: 0.1em;width: 100%;margin: 10px 0 20px; "><span style="background:#fff;padding:0 10px">OR</span></h5>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <button type="button" name="btn_as_guest" style="width:100%;height:50px;font-weight:bold;border-radius:3%" class="btn btn-default"><i class="fab fa-google" style="color:#dd4b39;font-size:large"> Continue with Google</i></button>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <button type="button" name="btn_as_guest" style="width:100%;height:50px;font-weight:bold;border-radius:3%" class="btn btn-default"><i class="fab fa-facebook" style="color:#3b5998;font-size:large"> Continue with Facebook</i></button>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <button type="submit" name="btn_as_guest" style="width:100%;height:50px;font-weight:bold;border-radius:3%" class="btn btn-default"><i class="fab fa-apple" style="font-size:large;color:black"> Continue with Apple</i></button>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <p class="text-body-smaller text-gray-lighter mt-xs-3">By clicking Continue with Google or Continue with Facebook, you agree to Etsy's Terms of Use and Privacy Policy. Etsy may send you communications; you may change your preferences in your account settings. We'll never post without your permission.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Checkout Login Popup Modal End -->
+
+
+            <!-- Checkout Register Popup Modal Start -->
+            <!-- Trigger the modal with a button -->
+            <!--<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>-->
+            <!-- Modal -->
+            <div class="modal fade" id="myModalRegister" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width:70%">
+                        <div class="modal-header">
+                            <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+                            <h4 class="modal-title" id="myModalLabel">Go to checkout</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <img src="~/Themes/everything/Content/images/userprofilecart.png" class="form-control" style="width:100px;height:100px;border-radius:100%;border:1px none #ddd" />
+                                </div>
+                                <div class="col-lg-9">
+                                    <label style="float:left;padding-top:35px;font-size:15px" id="lbl_GetUserEmail"></label><br /><br /><br />
+                                    <input type="submit" name="btn_diff_email" data-toggle="modal" data-target="#myModal" data-dismiss="modal" id="btn_diff_email" value="Use a differnet email address" style="text-decoration:underline;background-color:transparent;border:0px;float:left;margin-left:-6px">
+                                </div>
+                            </div>
+
+                            @*<div class="row">
+                                    <div class="col-lg-3">
+                                    </div>
+                                    <div class="col-lg-9">
+                                        <input type="submit" name="btn_diff_email" data-toggle="modal" data-target="#myModal" data-dismiss="modal" id="btn_diff_email" value="Use a differnet email address" style="text-decoration:underline;background-color:transparent;border:0px;float:left;">
+                                    </div>
+                                </div>*@
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h3 style="text-align:left">Create your account</h3>
+                                    <h5 style="text-align:left">Registration is easy</h5>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <label>First name</label>
+                                    <br />
+                                    <input type="text" class="form-control" style="width:100%;height:50px;" />
+                                    <br />
+                                    <label>Password</label>
+                                    <br />
+                                    <input type="password" class="form-control" style="width:100%;height:50px;" />
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <input type="submit" name="btn_continue" class="btn btn-lg" value="Continue" style="width:100%;height:50px;background-color:black;color:white;border-radius:2%" onclick="location.href='@Url.RouteUrl("Checkout")'" />
+                                </div>
+                            </div>
+
+                            @*<div class="row" style="padding-top:15px">
+                                    <div class="col-lg-4"></div>
+                                    <div class="col-lg-4">
+                                        <a href="login" style="width:100%;color:darkgrey">Trouble signing in?</a>
+                                    </div>
+                                    <div class="col-lg-4"></div>
+                                </div>
+
+                                <div class="row" style="padding-top:15px">
+                                    <div class="col-lg-12">
+                                        <h5 style="text-align: center;border-bottom: 1px solid #000;line-height: 0.1em;width: 100%;margin: 10px 0 20px; "><span style="background:#fff;padding:0 10px">OR</span></h5>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="padding-top:15px">
+                                    <div class="col-lg-12">
+                                        <button type="button" name="btn_as_guest" style="width:100%;height:50px;font-weight:bold;border-radius:3%" class="btn btn-default"><i class="fab fa-google" style="color:#dd4b39;font-size:large"> Continue with Google</i></button>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="padding-top:15px">
+                                    <div class="col-lg-12">
+                                        <button type="button" name="btn_as_guest" style="width:100%;height:50px;font-weight:bold;border-radius:3%" class="btn btn-default"><i class="fab fa-facebook" style="color:#3b5998;font-size:large"> Continue with Facebook</i></button>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="padding-top:15px">
+                                    <div class="col-lg-12">
+                                        <button type="submit" name="btn_as_guest" style="width:100%;height:50px;font-weight:bold;border-radius:3%" class="btn btn-default"><i class="fab fa-apple" style="font-size:large;color:black"> Continue with Apple</i></button>
+                                    </div>
+                                </div>*@
+
+                            <div class="row" style="padding-top:15px">
+                                <div class="col-lg-12">
+                                    <p class="text-body-smaller text-gray-lighter mt-xs-3">By clicking Continue with Google or Continue with Facebook, you agree to Etsy's Terms of Use and Privacy Policy. Etsy may send you communications; you may change your preferences in your account settings. We'll never post without your permission.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Checkout Register Popup Modal End -->
+
+
+
+            if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
+            {
+                var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
+                //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+                //of course, you can modify appropriate locales to include VAT info there
+                <div class="tax-shipping-info">
+                    @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                </div>
+            }
+            <div class="cart-options">
+                <div class="row">
+                    <div class="col-sm-6">
+                        @if (Model.IsEditable)
+                        {
+                            <div class="common-buttons">
+                                <input type="submit" name="updatecart" id="update-cart-button" value="@T("ShoppingCart.UpdateCart")" form="shopping-cart-form" class="button-2 btn btn-default update-cart-button" />
+                                <input type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")" form="shopping-cart-form" class="button-2 btn btn-default continue-shopping-button" />
+                            </div>
+                        }
+                    </div>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditable)
+                        {
+                            @Html.Partial("_CheckoutAttributes", Model.CheckoutAttributes, new ViewDataDictionary())
+                        }
+                        @if (!String.IsNullOrEmpty(Model.CheckoutAttributeInfo))
+                        {
+                            <div class="selected-checkout-attributes">
+                                @Html.Raw(Model.CheckoutAttributeInfo)
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 col-sm-8">
+                @if (Model.IsEditable)
+                {
+                    <div class="row">
+                        <div class="cart-collaterals">
+
+                            @Html.Partial("EstimateShipping", Model.EstimateShipping)
+                        </div>
+                    </div>
+                }
+            </div>
+            @*<div class="cart-footer">
+                    @Html.Widget("order_summary_cart_footer")
+                    <div class="row">
+                        <div class="col-md-8 col-sm-8">
+                            @if (Model.IsEditable)
+                            {
+                                <div class="row">
+                                    <div class="cart-collaterals">
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="deals">
+                                                @Html.Partial("_DiscountBox", Model.DiscountBox)
+                                                @Html.Partial("_GiftCardBox", Model.GiftCardBox)
+                                                @Html.Widget("order_summary_content_deals")
+                                            </div>
+                                        </div>
+                                        @Html.Partial("EstimateShipping", Model.EstimateShipping)
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        @*<div class="col-md-4 col-sm-4">
+                                  <div class="totals total-price">
+                                      @Html.Action("OrderTotals", "ShoppingCart", new { isEditable = Model.IsEditable })
+                                      @if (Model.IsEditable)
+                                      {
+                                          if (!String.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
+                                          {
+                                          <div class="min-amount-warning">
+                                              @Model.MinOrderSubtotalWarning
+                                          </div>
+                                          }
+                                      }
+                                      @if (Model.IsEditable)
+                                      {
+                                          if (Model.TermsOfServiceOnShoppingCartPage)
+                                          {
+                                              <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
+                                                  <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
+                                              </div>
+                                              <div class="terms-of-service">
+                                                  <label for="termsofservice">
+                                                      <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                                      @T("Checkout.TermsOfService.IAccept")
+                                                      <span><a class="read" id="read-terms">@T("Checkout.TermsOfService.Read")</a></span>
+                                                  </label>
+                                                  <script>
+                                                      $(document).ready(function () {
+                                                          $('#read-terms').on('click', function (e) {
+                                                              e.preventDefault();
+                                                              displayPopupContentFromUrl('@Url.RouteUrl("TopicPopup", new {SystemName = "conditionsofuse"})', '@T("Checkout.TermsOfService")');
+                                                          });
+                                                      });
+                                                  </script>
+                                              </div>
+                                          }<br/>
+                                          <div class="checkout-buttons">
+                                              @if (String.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
+                                              {
+                                                  <script type="text/javascript">
+                                                      $(document).ready(function () {
+                                                          $('#checkout').click(function () {
+                                                              //terms of service
+                                                              var termOfServiceOk = true;
+                                                              if ($('#termsofservice').length > 0) {
+                                                                  //terms of service element exists
+                                                                  if (!$('#termsofservice').is(':checked')) {
+                                                                      $("#terms-of-service-warning-box").dialog();
+                                                                      termOfServiceOk = false;
+                                                                  } else {
+                                                                      termOfServiceOk = true;
+                                                                  }
+                                                              }
+                                                              return termOfServiceOk;
+                                                          });
+                                                      });
+                                                  </script>
+                                              <button type="submit" id="checkout" name="checkout" value="checkout" class="button-1 checkout-button btn btn-default">
+                                                  @T("Checkout.Button")
+                                              </button>
+                                              }
+                                          </div>
+                                          <div class="addon-buttons">
+                                              @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)
+                                              @Html.Partial("_ButtonPaymentMethod", Model)
+                                          </div>
+                                      }
+                                  </div>
+                            </div>
+                    </div>
+                </div>*@
+            if (Model.IsEditable)
+            {
+                @Html.Action("CrossSellProducts", "Product")
+            }
+        }
+    }
+    else
+    {
+        <div class="no-data">
+            @T("ShoppingCart.CartIsEmpty")
+        </div>
+    }
+    @Html.Widget("order_summary_content_after")
+</div>
+@*<script type="text/javascript">
+        $(document).ready(function () {
+            $('#update-cart-button').click(function () {
+                var data = $("#shopping-cart-form").serialize();
+                console.log("data=" + data);
+                displayAjaxLoading(true);
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.RouteUrl("ShoppingCart"))",
+                    data: data,
+                    success: function (data) {
+                        displayAjaxLoading();
+                        $(document).html(data);
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        displayAjaxLoading();
+                        alert('Failed to retrieve update cart.');
+                    }
+                });
+            });
+            });
+
+
+    </script>*@
+<script>
+
+    function OpenCheckoutModal(e) {
+        e.preventDefault();
+        var authenticated = $('.ico-account').length > 0;
+        if (!authenticated) {
+            // alert('not authenticated');
+            // setTimeout(function () {
+            //$('#checkoutModal').modal({ show: false })
+            $('#checkoutModal').css('opacity', 1);
+            $('#checkoutModal').css('display', 'block');
+            $('body').click(function (event) {
+                // console.log(event.target.id);
+                if ($('checkoutModal').css('display', 'none')) {
+
+                    if (event.target.id != "checkout") {
+                        console.log(event.target.id);
+                        $('#checkoutModal').css('display', 'none');
+                        $('#checkoutModal').css('opacity', 0);
+                        $('.modal-backdrop').remove();
+                    }
+                } else if (event.target.id != "checkoutModal") {
+
+                    $('#checkoutModal').css('display', 'none');
+                    $('#checkoutModal').css('opacity', 0);
+                    $('.modal-backdrop').remove();
+                }
+
+
+            });
+            // e.preventDefault();
+            // console.log('clicked');
+            //if (!$(event.target).closest('#checkoutModal').length && !$(event.target).is('#checkoutModal')) {
+
+            // }
+            //if ($('#checkoutModal').length >= 1) {
+            //    $('#checkoutModal').css('display', 'none');
+            //    $('#checkoutModal').css('opacity', 0);
+            //    $('.modal-backdrop').remove();
+            //}
+
+
+
+            // setTimeout(function () {
+            // alert('set js')
+
+            //  },1000);
+
+            // $('#checkoutModal').modal('show');
+            // }, 1000);
+        } else {
+            $('#checkoutModal').modal('hide')
+            window.location.href = '/onepagecheckout';
+        }
+
+    }
+    $(document).ready(function () {
+        //$("#btn_continue").click(function () {
+        //    $("#myModalRegister").css("opacity", "1");
+        //})
+
+        $('#closeBtn').click(function () {
+            $('#checkoutModal').css('display', 'none');
+            $('#checkoutModal').css('opacity', 0);
+            $('.modal-backdrop').remove();
+            //$('.modal-backdrop').css('opacity', 0);
+            // $('#checkoutModal').modal('hide');
+        });
+        //$('#closeBtn').click(function () {
+        //    $('#checkoutModal').hide();
+        //    $("#checkoutModal").css('opacity', 0);
+        //});
+
+    });
+
+    $('#a1').click(function () {
+        $('#checkout').data('type', 'a1');
+        $('#checkout').html('Proceed to Checkout');
+    })
+
+    $('#a2').click(function () {
+        $('#checkout').data('type', 'a2');
+        $('#checkout').html('pay with paypal');
+    })
+
+    $('#checkout').click(function () {
+        if ($(this).data('type') == 'a1') {
+            var authenticated = $('.ico-account').length > 0;
+            if (!authenticated) {
+                $('#checkoutModal').css('opacity', 1);
+                $('#checkoutModal').css('display', 'block');
+                $('body').click(function (event) {
+                    // console.log(event.target.id);
+                    if ($('checkoutModal').css('display', 'none')) {
+
+                        if (event.target.id != "checkout") {
+                            console.log(event.target.id);
+                            $('#checkoutModal').css('display', 'none');
+                            $('#checkoutModal').css('opacity', 0);
+                            $('.modal-backdrop').remove();
+                        }
+                    } else if (event.target.id != "checkoutModal") {
+
+                        $('#checkoutModal').css('display', 'none');
+                        $('#checkoutModal').css('opacity', 0);
+                        $('.modal-backdrop').remove();
+                    }
+                });
+            } else {
+                window.location.href = "/onepagecheckout";
+            }
+        }
+        if ($(this).data('type') == 'a2') {
+            $.ajax({
+                cache: false,
+                url: '/checkout/OpcConfirmOrder',
+                type: 'post',
+                success: function () {
+                    window.location.href = 'ShoppingCart/LinkToPaypalDirectly';
+                },
+            });
+            
+    
+        }
+})
+
+
+</script>

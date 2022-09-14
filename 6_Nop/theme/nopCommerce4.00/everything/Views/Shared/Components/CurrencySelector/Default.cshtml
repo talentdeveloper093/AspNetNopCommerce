@@ -1,0 +1,39 @@
+﻿@model CurrencySelectorModel
+@using Microsoft.AspNetCore.Http
+@using System.Net
+@using Nop.Core
+@inject IWebHelper webHelper
+@inject IHttpContextAccessor httpContextAccessor
+@if (Model.AvailableCurrencies.Count > 1)
+{
+    {
+        var currencies = Model.AvailableCurrencies.Select(x => new SelectListItem
+        {
+            Text = x.Name,
+            Value = webHelper.ModifyQueryString(Url.RouteUrl("ChangeCurrency", new { customercurrency = x.Id }), "returnurl=" + WebUtility.UrlEncode(webHelper.GetRawUrl(httpContextAccessor.HttpContext.Request)), null),
+            Selected = x.Id.Equals(Model.CurrentCurrencyId)
+        });
+        @*<select Class="form-control" id="customerCurrency" name="customerCurrency" asp-items="@currencies" onchange="setLocation(this.value);"></select>*@
+
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" href="#">
+                @foreach (var just_currency in currencies)
+                {
+                    if (just_currency.Selected == true)
+                    {
+                        @just_currency.Text
+                    }
+                }
+                <i class="fa fa-angle-down"></i>
+            </a>
+            <ul class="dropdown-menu">
+
+                @foreach (var currency in currencies)
+                {
+                    <li><a href="@currency.Value">@currency.Text</a></li>
+
+                }
+            </ul>
+        </li>
+    }
+}

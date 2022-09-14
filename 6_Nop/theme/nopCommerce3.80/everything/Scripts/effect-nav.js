@@ -1,0 +1,4 @@
+/* <![CDATA[ */
+//var zmb_ajaxurl = "http:\/\/zanmb.zanthemes.net\/wp-admin\/\/admin-ajax.php";
+var zmb = { "has_nopcommerce": "yes", "": "\r\n\r\n<ul class=\"cart_list product_list_widget \">\r\n\r\n\t\r\n\t\t<li class=\"empty\">No products in the cart.<\/li>\r\n\r\n\t\r\n<\/ul><!-- end product list -->\r\n\r\n\r\n", "cart_count": "0", "cart_url": "http:\/\/zanmb.zanthemes.net\/cart\/", "vertical_menu_info": { "vertical": { "base_width_type": "closest", "closest_selector": ".vertical-menu-container", "lv0_width": 200, "base_width": 1170, "menu_wrap_selector": ".zmb-menu-location-vertical", "break_point": 1199 }, "vertical_kt_doc": { "base_width_type": "closest", "closest_selector": ".document-menu-container", "lv0_width": 280, "base_width": 1170, "menu_wrap_selector": ".zmb-menu-location-vertical_kt_doc", "break_point": 767 } }, "sliding_btn_selector": ".zmb-show-sliding", "show_sliding_on": "" };
+/* ]]> */

@@ -1,0 +1,127 @@
+﻿@model FooterModel
+@using Nop.Web.Extensions
+@using Nop.Web.Models.Common;
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Infrastructure
+
+<div class="newsletter-cont">
+  <div class="container text-center">
+    <div class="row"> 
+         <div class="col-md-12">          
+            @Html.Action("NewsletterBox", "Newsletter")
+       </div>
+     </div>
+   </div>
+</div>
+<footer>
+    <div class="container first-footer">
+        <div class="row ">
+            <div class="col-sm-3 col-xs-6">
+                <h3>About Us </h3>
+                <div class="contactInfo">
+                    <p>Lorem Ipsum is a dummy content. it is a typesting content. laboriosam maxime molestias numquam odio officis.</p>
+                    <ul>
+                        <li><a href="#" target="_blank"><i class="fa fa-phone"></i> +91-120-420-***</a></li>
+                        <li><a href="#" target="_blank"><i class="fa fa-envelope-o"></i> info@domain.com</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-2 col-xs-6">
+                <h3>@T("Footer.Information")</h3>
+                <ul>
+                    @if (Model.SitemapEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("Sitemap")">@T("Sitemap")</a></li>
+                    }
+                    @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn1).ToList())
+                    {
+                        <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
+                    }
+                    <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+                </ul>
+            </div>
+
+            <div class="col-sm-2 col-xs-6">
+                <h3>@T("Footer.CustomerService")</h3>
+                <ul>
+                    <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a> </li>
+                    @if (Model.NewsEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("NewsArchive")">@T("News")</a></li>
+                    }
+                    @if (Model.BlogEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+                    }
+                    @if (Model.ForumEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+                    }
+                    @if (Model.RecentlyViewedProductsEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("RecentlyViewedProducts")">@T("Products.RecentlyViewedProducts")</a></li>
+                    }
+                    @if (Model.CompareProductsEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("CompareProducts")">@T("Products.Compare.List")</a></li>
+                    }
+                </ul>
+            </div>
+
+
+            <div class="col-sm-2 col-xs-6">
+                <h3>@T("Footer.MyAccount")</h3>
+                <ul>
+                    <li><a href="@Url.RouteUrl("CustomerInfo")" class="account">@T("Account.MyAccount")</a></li>
+
+                    @if (Model.AllowCustomersToApplyForVendorAccount)
+                    {
+                        <li><a href="@Url.RouteUrl("ApplyVendorAccount")">@T("Vendors.ApplyAccount")</a></li>
+                    }
+                    @if (Model.ShoppingCartEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("ShoppingCart")" class="ico-cart">@T("ShoppingCart")</a></li>
+                    }
+                    @if (Model.WishlistEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("Wishlist")" class="ico-wishlist">@T("Wishlist")</a></li>
+                    }
+                </ul>
+            </div>
+            <div class="col-sm-3 col-xs-6 getintouch">
+                <h3> Follow Us </h3>
+                <div class="social-icons">
+                    @Html.Action("Social", "Common")
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="copyrights">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <img src="/Themes/everything/Content/images/payment_sprite.png" alt="" />
+                </div>
+                <div class="col-sm-12">
+                    <div class="">
+                        Powered by <a href="http://globaltechnologic.com/">Global Technologic</a>
+                        @T("Content.CopyrightNotice", DateTime.Now.Year.ToString(), Model.StoreName)
+                    </div>
+                    @if (Model.DisplayTaxShippingInfoFooter)
+                    {
+                        var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
+                        <div class="footer-tax-shipping text-center">
+                            @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                        </div>
+                    }
+                    <div class="text-center">
+                        @Html.Action("StoreThemeSelector", "Common")
+                    </div>
+                </div>
+            </div>
+        </div>
+        @Html.Widget("footer")
+    </div>
+</footer>
+<a href="#header" class="scrollup"><i class="fa fa-angle-up"></i></a>

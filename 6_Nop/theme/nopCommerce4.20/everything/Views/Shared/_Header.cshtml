@@ -1,0 +1,32 @@
+﻿<header id="header">
+    <div class="navbar navbar-expand-md top-menu topbar" role="navigation">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".test">
+                <span class="sr-only">Toggle navigation</span>
+                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+            </button>
+            <div class="collapse navbar-collapse test">
+                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })
+                @await Component.InvokeAsync("HeaderLinks")
+
+            </div>
+        </div>
+    </div>
+   <div class="masthead">
+    <div class="container-fluid">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMiddle })
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                @await Component.InvokeAsync("TopMenu")
+                <div class="searchbtn">
+                    <i class="fa fa-search"></i>
+                </div>
+                <div class="search-box">
+                    @await Component.InvokeAsync("SearchBox")
+                </div>
+            </div>
+        </div>
+       </div>
+    </div>
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderAfter })
+</header>

@@ -1,0 +1,35 @@
+﻿@model ProductDetailsModel
+@{
+    Html.AddScriptParts(ResourceLocation.Footer, "http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Themes/everything/Content/scripts/ProductZoom.js");
+    Html.AddCssFileParts("~/Themes/everything/Content/css/ProductZoom.css");
+}
+<div class="gallery">
+    <div class="picture image-box">
+        @if (Model.DefaultPictureZoomEnabled)
+        {
+          <div class="targetarea">
+            @*<a href="@Model.DefaultPictureModel.FullSizeImageUrl" title="@Model.DefaultPictureModel.Title" id="main-product-img-lightbox-anchor-@Model.Id">*@
+                <img alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" itemprop="image" id="productzoom" />
+            @*</a>*@
+          </div>  
+        }
+        else
+        {
+            <img id="productzoom" alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" itemprop="image" />
+        }
+    </div>
+    @if (Model.PictureModels.Count > 1)
+    {
+        <ul>
+            @foreach (var picture in Model.PictureModels)
+            {
+            <li class="product-thumb productzoom thumbs">
+                <a class="thumb-popup-link thumb-item" href="@picture.FullSizeImageUrl" data-large="@picture.FullSizeImageUrl" data-title="@picture.ImageUrl">
+                <img src="@picture.ThumbImageUrl" alt="@picture.AlternateText" title="@picture.Title" />
+                </a>
+            </li>
+            }
+        </ul>        
+     }
+</div>

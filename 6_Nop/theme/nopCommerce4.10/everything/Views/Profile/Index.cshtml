@@ -1,0 +1,45 @@
+﻿@model ProfileIndexModel
+@{    
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Profile").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-profile-page");
+}
+<div class="page profile-page">
+    <div class="page-title">
+        <h1>@Model.ProfileTitle</h1>
+    </div>
+    <div class="page-body">
+        @{
+            var selectPostsTab = Model.ForumsEnabled && Model.PagingPosts ? ".tabs( 'option', 'active', 1 )" : "";
+        }
+        <div class="inbox-tabs">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#PersonalInfo" role="tab">@T("Profile.PersonalInfo")</a>
+                </li>
+                @if (Model.ForumsEnabled)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#LatestPosts" role="tab">@T("Profile.LatestPosts")</a>
+                    </li>
+                }
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="fade show tab-pane active" id="PersonalInfo" role="tabpanel">
+                    @await Component.InvokeAsync("ProfileInfo", new { customerProfileId = Model.CustomerProfileId })
+                </div>
+                @if (Model.ForumsEnabled)
+                {
+                    <div class="fade tab-pane" id="LatestPosts" role="tabpanel">
+                        @await Component.InvokeAsync("ProfilePosts", new { customerProfileId = Model.CustomerProfileId, pageNumber = Model.PostsPage })
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

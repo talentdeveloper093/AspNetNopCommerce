@@ -1,0 +1,65 @@
+﻿@model IList<ProductOverviewModel>
+@if (Model.Count > 0)
+{
+    <div class="related-products-grid product-grid">
+        <div class="title mid-content-title heading">
+            <h2>@T("Products.RelatedProducts")</h2>
+            <span class="float-right">  
+                <a class="carousel-control-prev" href="#carousel-example-generic-homepage-product" data-slide="prev">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                <a class="carousel-control-next" href="#carousel-example-generic-homepage-product" data-slide="next">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </span>
+        </div>
+        <div id="carousel-example-generic-homepage-product" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            @{
+               var ci = 0;
+            }
+            @foreach (var item in Model)
+            {
+                if (ci == 0)
+                {
+                    @:<div class="item active">
+                    @:<div class="row box-products">
+                }
+                else if (ci % 4 == 0)
+                {
+                    @:<div class="item">
+                    @:<div class="row box-products">
+                 }
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="item-box product-grid offer offer-default">                                                   
+                         @await Html.PartialAsync("_ProductBox", item)                        
+                    </div>
+                </div>
+                if (ci % 4 == 3)
+                {
+                    @:</div>
+                    @:</div>
+                }
+                ci++;
+            }
+            @if (ci % 4 == 3)
+            {
+                @:</div>
+                @:</div>
+              }
+            @*<div class="item-grid">
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                  <div class="col-sm-4 col-md-3 clearfix">  
+                    <div class="item-box product-grid offer offer-default">
+                        @await Html.PartialAsync("_ProductBox", item)
+                    </div>
+                  </div>
+                }
+            </div>
+        </div>*@
+        </div>
+    </div>
+  </div>
+}

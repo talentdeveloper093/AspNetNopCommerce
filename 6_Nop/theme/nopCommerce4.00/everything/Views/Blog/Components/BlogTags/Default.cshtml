@@ -1,0 +1,18 @@
+﻿@model BlogPostTagListModel
+@if (Model.Tags.Count > 0)
+{
+    <div class="block block-popular-blogtags side-nav">
+        <div class="panel-heading">
+            <h3>@T("Blog.TagCloud")</h3>
+        </div>
+        <div class="listbox">
+            <ul class="tags">
+                @foreach (var item in Model.Tags)
+                {
+                    <li><a href="@Url.RouteUrl("BlogByTag", new { tag = item.Name })">@item.Name</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}

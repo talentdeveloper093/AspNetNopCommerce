@@ -1,0 +1,68 @@
+﻿@model  IList<Nop.Web.Models.Catalog.ManufacturerModel>
+@{
+    ViewBag.Title = "ManufacturerAll";
+    var i = 0;
+}
+
+@using Nop.Web.Models.Catalog;
+@if (Model.Count > 0)
+{
+    <section class="manufactures">
+        <div class="container">       
+            <div class="product-grid Manufacture-item">
+                <div class="title mid-content-title heading">
+                    <h2>@T("Admin.Catalog.Manufacturers")</h2>
+                    <span class="pull-right">
+                        <a class="title-carousel-control" href="#myCarousel" data-slide="prev"><i class="fa fa-angle-left"></i></a>
+                        <a class="title-carousel-control" href="#myCarousel" data-slide="next"><i class="fa fa-angle-right"></i></a>
+                    </span>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="carousel slide" id="myCarousel">
+                            <div class="carousel-inner">
+                                @foreach (var item in Model)
+                                {
+                                    if (i == 0)
+                                    {
+                                        <div class="item active">
+                                            <div class="col-xs-2 col-md-2 col-sm-2"><a href="#"><img src="@item.PictureModel.ImageUrl" class="img-responsive"></a></div>
+                                        </div>
+                                        i++;
+                                    }
+                                    else
+                                    {
+                                        <div class="item">
+                                            <div class="col-xs-2 col-md-2 col-sm-2"><a href="#"><img src="@item.PictureModel.ImageUrl" class="img-responsive"></a></div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>        
+        <script>
+            $(document).ready(function () {
+                $('.manufactures #myCarousel').carousel({
+                    interval: 5000
+                , pause: 'hover'
+                , wrap: true
+                });
+                $('.manufactures .carousel .item').each(function () {
+                    var next = $(this);
+                    var last;
+                    for (var i = 0; i < 5; i++) {
+                        next = next.next();
+                        if (!next.length) {
+                            next = $(this).siblings(':first');
+                        }
+                        last = next.children(':first-child').clone().appendTo($(this));
+                    }
+                    last.addClass('rightest');
+                });
+            });
+        </script>
+    </section>
+}

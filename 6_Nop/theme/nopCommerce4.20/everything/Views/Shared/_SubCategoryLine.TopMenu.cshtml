@@ -1,0 +1,38 @@
+﻿@model Nop.Web.Models.Catalog.CategorySimpleModel
+<li class="menu-item zanmenu-menu-item dropdown menu-item-has-children">
+    @*<span class="fa fa-angle-down visible-xs"></span>*@
+    <a class="zmb-item-title zmb-dropdown-toggle" data-title="Mega Menu" data-toggle="dropdown" href="@Url.RouteUrl("Category", new { SeName = Model.SeName })" role="button" aria-expanded="false">
+        <span class="category-name">@Model.Name <i class="fa fa-angle-down"></i></span>
+        @if (Model.NumberOfProducts.HasValue)
+        {
+            <text> </text>@T("Categories.TotalProducts", Model.NumberOfProducts.Value)
+        }
+    </a>
+    <div class="sub-menu zanmenu">
+      <div class="zmb-posts-list-wrap zan-posts-list-wrap wow fadeInUp post-list-style_2" data-wow-delay="0.4s">
+         <div class="zanmenu-content">  
+         @{
+         <ul>
+            @foreach (var subCategory in Model.SubCategories)
+             {
+              <li> 
+                  <a class="widgettitle zmb-heading" href="@Url.RouteUrl("Category", new { SeName = @subCategory.SeName})">@subCategory.Name </a>
+                  <ul>
+                   @foreach (var step3 in subCategory.SubCategories)
+                   {
+                    <li>
+                        <a href="@Url.RouteUrl("Category", new { SeName = @step3.SeName })">
+                            <i class="fa fa-caret-right" aria-hidden="true"></i> @step3.Name
+                       </a>
+                    </li>
+                   }
+                  </ul>
+              </li>
+             }
+          </ul>
+         }
+       </div>
+      </div>  
+    </div>           
+</li>
+@*@await Html.PartialAsync("_CategorySubCategoryLine.TopMenu", subCategory)*@

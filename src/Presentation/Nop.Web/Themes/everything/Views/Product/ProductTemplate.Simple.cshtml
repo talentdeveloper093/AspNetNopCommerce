@@ -1,0 +1,1255 @@
+﻿@model ProductDetailsModel
+@using Nop.Core
+@using Nop.Core.Domain.Seo;
+@using Nop.Core.Infrastructure;
+@using Nop.Services.Localization;
+@using Nop.Web.Models.Catalog;
+@using Nop.Core.Domain.Orders
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title, meta
+    Html.AddTitleParts(!String.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
+    Html.AddMetaDescriptionParts(Model.MetaDescription);
+    Html.AddMetaKeywordParts(Model.MetaKeywords);
+
+    var seoSettings = EngineContext.Current.Resolve<SeoSettings>();
+
+    //canonical URL
+    if (seoSettings.CanonicalUrlsEnabled)
+    {
+
+        var productUrl = Url.RouteUrl("Product", new { SeName = Model.SeName }, this.Request.Url.Scheme);
+        Html.AddCanonicalUrlParts(productUrl);
+    }
+
+    //open graph META tags
+    if (seoSettings.OpenGraphMetaTags)
+    {
+
+        var storeName = EngineContext.Current.Resolve<Nop.Core.IStoreContext>().CurrentStore.GetLocalized(x => x.Name);
+
+        Html.AddHeadCustomParts("<meta property=\"og:type\" content=\"product\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:title\" content=\"" + Html.Encode(Model.Name) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:description\" content=\"" + Html.Encode(Model.MetaDescription) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:image\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:url\" content=\"" + Request.Url.AbsoluteUri + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:site_name\" content=\"" + Html.Encode(storeName) + "\" />");
+    }
+
+    //Twitter META tags
+    if (seoSettings.TwitterMetaTags)
+    {
+        var storeName = EngineContext.Current.Resolve<IStoreContext>().CurrentStore.GetLocalized(x => x.Name);
+        Html.AddHeadCustomParts("<meta property=\"twitter:card\" content=\"summary\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:site\" content=\"" + Html.Encode(storeName) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:title\" content=\"" + Html.Encode(Model.Name) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:description\" content=\"" + Html.Encode(Model.MetaDescription) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:image\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:url\" content=\"" + Request.Url.AbsoluteUri + "\" />");
+    }
+}
+
+<style>
+    .btn_show {
+        background-color: transparent;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        width: 200px;
+        height: 30px;
+        position: absolute;
+    }
+
+    .btn_showD {
+        background-color: transparent;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        width: 200px;
+        height: 30px;
+        position: absolute;
+    }
+
+    .btn_show:hover {
+        background-color: lightgrey;
+    }
+
+    .btn_showhide {
+        padding-left: 30%;
+        /*text-align:center;*/
+    }
+
+    .btnGetShipCost {
+        float: left;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 200px;
+        height: 32px;
+        color: #797979;
+    }
+
+
+
+    .btn_shoppolicies {
+        float: left;
+        background-color: transparent;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        width: 200px;
+        height: 30px;
+        color: black;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        padding-top: 5px;
+        cursor: pointer;
+    }
+
+        .btn_shoppolicies:hover {
+            background-color: lightgrey;
+            text-decoration: none;
+        }
+
+    .h_product_name {
+        font-family: "Guardian-EgypTT", serif;
+        font-size: 26px;
+        font-weight: 300;
+        color: #222;
+    }
+
+    #picture_slideshow {
+        width: auto;
+        height: 80px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        border-width: auto;
+        -webkit-filter: blur(1px); /* Chrome, Safari, Opera */
+        filter: blur(1px);
+    }
+
+        #picture_slideshow:hover {
+            -webkit-filter: blur(0px); /* Chrome, Safari, Opera */
+            filter: blur(0px);
+        }
+
+    #short_description {
+        color: #222;
+        font-family: "Graphik Webfont",-apple-system,BlinkMacSystemFont,"Roboto","Droid Sans","Segoe UI","Helvetica",Arial,sans-serif;
+        line-height: 30px;
+        font-size: 22px;
+        font-weight: 300;
+        letter-spacing: 0.35px;
+    }
+
+    #full_description {
+        font-size: 16px;
+        font-weight: 300;
+        color: #222;
+        font-family: "Graphik Webfont",-apple-system,BlinkMacSystemFont,"Roboto","Droid Sans","Segoe UI","Helvetica",Arial,sans-serif;
+    }
+
+    #ship_description {
+        font-size: 14px;
+        font-weight: 300;
+        color: #222;
+        font-family: "Graphik Webfont",-apple-system,BlinkMacSystemFont,"Roboto","Droid Sans","Segoe UI","Helvetica",Arial,sans-serif;
+    }
+    #ship_title {
+        font-size: 8px;
+        font-weight: 300;
+        color: #222;
+        font-family: "Graphik Webfont",-apple-system,BlinkMacSystemFont,"Roboto","Droid Sans","Segoe UI","Helvetica",Arial,sans-serif;
+    }
+</style>
+
+<!--product breadcrumb-->
+<div class="breadcrumb-view">
+    <div class="container">
+        @Html.Partial("_ProductBreadcrumb", Model.Breadcrumb)
+    </div>
+</div>
+<div class="container" style="min-width:100%;width:100%;margin-top:-20px">
+    <div class="page product-details-page panel panel-default form-panel">
+        <div class="panel-body">
+            @Html.Widget("productdetails_top")
+            @using (Html.BeginRouteForm("Product", new { SeName = Model.SeName }, FormMethod.Post, new { id = "product-details-form" }))
+            {
+                <div itemscope itemtype="http://schema.org/Product" data-productid="@Model.Id">
+                    <div class=" product-essential">
+                        @Html.Widget("productdetails_before_pictures", Model.Id)
+                        <div class="row">
+                            <div class="dv_skumodel" style="padding-left:15px">
+                                @Html.Partial("_SKU_Man_GTIN_Ven", Model)
+                            </div>
+
+
+
+                            <!--product pictures-->
+                            <div class="col-md-6 col-sm-7">
+                                @*@Html.Partial("_SKU_Man_GTIN_Ven", Model)*@
+
+                                @Html.Partial("_ProductDetailsPictures", Model)
+                                @Html.Widget("productdetails_after_pictures", Model.Id)
+                                @Html.Partial("_ProductReviewOverview", Model.ProductReviewOverview)
+                            </div>
+                            @*  <hr style="border-top:1px solid #bdbbbb;width:42%;position:absolute;margin-top:226px;margin-left:54%" />*@
+
+                            <!--Product Details-->
+                            <div class="col-sm-3" @*style="width:48%"*@>
+
+                                <div class="product-contant-text">
+                                    <h1>@Model.Name</h1>
+
+                                    @*<h6>Short Description</h6>
+
+                                        @Model.ShortDescription*@
+
+
+                                    @if (!String.IsNullOrEmpty(Model.ShortDescription))
+                                    {
+                                        <div class="short-description" id="short_description">
+                                            @* <h5>Short description</h5>*@
+                                            @Model.ShortDescription
+                                        </div>
+                                        <!--availability-->
+
+                                        var dataDictPrice = new ViewDataDictionary();
+                                        dataDictPrice.TemplateInfo.HtmlFieldPrefix = string.Format("price_{0}", Model.Id);
+                                        @* <h6>Condition <span class="condition-icon">*</span></h6>*@
+                                        <div class="dv_skumodel">
+                                            <div class="product_price" style="color:#000; width:50px;">
+                                                @Html.Partial("_ProductPrice", Model.ProductPrice, dataDictPrice)
+                                            </div>
+                                            @Html.Partial("_Availability", Model)
+
+
+                                        </div>
+                                    }
+
+                                    @*@{
+                                         var dataDictAttributes = new ViewDataDictionary();
+                                         dataDictAttributes.TemplateInfo.HtmlFieldPrefix = string.Format("attributes_{0}", Model.Id);
+                                         @Html.Partial("_ProductAttributes", Model.ProductAttributes, dataDictAttributes)
+                                        }*@
+
+
+
+                                    @*<div class="quantity-box">
+                                            <h6>Quantity:</h6>
+                                           <div class="quantity-ic-dc">
+                                          <div class="value-button" id="decrease" onclick="decreaseValue()" value="Decrease Value">-</div>
+                                         <input id="number" value="0" />
+                                          <div class="value-button" id="increase" onclick="increaseValue()" value="Increase Value">+</div>
+                                          </div>
+                                        </div>*@
+                                    <a href="#" onclick="AjaxCart.buy_now_simple_functionality('@Url.RouteUrl("BuyNowSimpleFunctionality", new { productId = Model.AddToCart.ProductId, shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart })', '#product-details-form');return false;" > <div class="buy-now-btn"><span class="glyphicon glyphicon-shopping-cart" ></span> buy now</div></a>
+
+                                    <div class="btn-group col-md-12">
+                                        @*<div class="col-sm-6 add-btn-padding p-0 m-0">
+                                            <a href="#"><div class="add-bag-btn"><i class="fa fa-cart-plus"></i>add to bag</div></a>
+
+                                            </div>*@
+                                        <div id="divcart" style="width:100% !important;">
+
+                                            @{
+                                                @*var dataDictPrice = new ViewDataDictionary();
+                                                    dataDictPrice.TemplateInfo.HtmlFieldPrefix = string.Format("price_{0}", Model.Id);
+                                                    @Html.Partial("_ProductPrice", Model.ProductPrice, dataDictPrice)*@
+
+
+
+                                                var dataDictAddToCart = new ViewDataDictionary();
+                                                // dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = string.Format("addtocart_{0}", Model.Id);
+                                                @Html.Partial("_AddToCart", Model.AddToCart, dataDictAddToCart)
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group col-md-12 make-shipping-margin" style="padding:0px">
+
+                                        @if (Model.IsMakeOffer)
+                                        {
+                                            <!--<a href="#"> <div class="make-offer-btn" onclick="AjaxCart.OpenOfferPopup(207);return false;"><i class="fa fa-cart-plus"></i>Make 5Offer</div></a>-->
+                                            <input type="button" class="btn btn-lg" style="margin-left: 1%;background-color:#ff0000;color:white;width: 256px;height: 40px;border-radius: 20px;font-size: 10px; padding: 14px 48px;text-align:center;" value="Make Offer" onclick="AjaxCart.OpenOfferPopup(207);return false;" />
+                                        }
+                                        <div style="width:50%;" class="row">
+                                            <input type="button" class="btn btn-lg" style="margin-left: 18px;background-color:grey;color:white;width: auto;height: 40px;border-radius: 20px;font-size: 10px; padding: 14px 48px;text-align:center;" value="Add to wishlist" onclick="AjaxCart.addproducttocart_catalog('/addproducttocart/catalog/203/2/1');return false;" />
+                                        </div>
+                                        <!-- <a href="#"><div class="shipping-cost-btn"><i class="fa fa-cart-arrow-down"></i>Shipping Cost</div></a>-->
+                                    </div>
+                                    <hr>
+                                    <div class="accordion">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h2 class="mb-0">
+                                                    @*  <button class="btn btn-link btn-block text-left" type="button" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                        Description
+                                                             </button>*@
+                                                </h2>
+                                            </div>
+                                            @*@Html.Partial("_ShareButton", Model)*@
+                                            @if (!String.IsNullOrEmpty(Model.FullDescription))
+                                            {
+                                                <p class="full_description" id="full_description">
+                                                    <br />
+                                                    <br />
+                                                    <h5>Description</h5>
+                                                    @Html.Raw(Model.FullDescription) <!-- , new { class = "description" } -->
+                                                </p>
+                                                <div class="btn_showhide">
+                                                    <button type="button" class="btn_showD" name="btn_showD" id="btn_showD">Learn more about this item</button>
+                                                </div>
+                                            }
+
+                                            @Html.Widget("productdetails_overview_bottom")
+                                            <br />
+                                            <div class="active sel"> </div>
+
+                                            @if (!String.IsNullOrEmpty(Model.ShippingandPaymentPolicies))
+                                            {
+                                            <p class="ship_description" id="ship_description">
+                                           
+                                                <h2> Shipping and Payment  Polices   </h2>
+                                            
+                                                @Html.Raw(Model.ShippingandPaymentPolicies) <!-- , new { class = "description" } -->
+                                            </p>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <button type="button" class="btnGetShipCost" id="btn_getshipcost" name="btn_getshipcost">Get shipping cost <i class="fa fa-caret-down"></i></button>
+                                                    </div>
+
+
+
+                                                </div>
+
+                                                <div class="row" id="div_country_txt" style="display:none; margin-top:40px">
+                                                    <div class="col-md-6">
+                                                        <h5>Country</h5>
+                                                        <select class="form-control" name="txt_shippingcountry" id="txt_shippingcountry">
+                                                            <option value="" selected="selected">Select Country</option>
+                                                            <option value="14.54">United States</option>
+                                                            <option value="Free">United Kingdom</option>
+                                                            <option value="16.40">Afghanistan</option>
+                                                            <option value="10.65">Albania</option>
+                                                            <option value="50.44">Algeria</option>
+                                                            <option value="07.45">American Samoa</option>
+                                                            <option value="12.64">Andorra</option>
+                                                            <option value="21.32">Angola</option>
+                                                            <option value="12.32">Anguilla</option>
+                                                            <option value="9.8">Antarctica</option>
+                                                            <option value="4.6">Antigua and Barbuda</option>
+                                                            <option value="10.5">Argentina</option>
+                                                            <option value="13.00">Armenia</option>
+                                                            <option value="12.46">Aruba</option>
+                                                            <option value="4.8">Australia</option>
+                                                            <option value="16.38">Austria</option>
+                                                            <option value="3.2">Azerbaijan</option>
+                                                            <option value="4.8">Bahamas</option>
+                                                            <option value="7.23">Bahrain</option>
+                                                            <option value="4.64">Bangladesh</option>
+                                                            <option value="8.00">Barbados</option>
+                                                            <option value="12.00">Belarus</option>
+                                                            <option value="12.48">Belgium</option>
+                                                            <option value="7.54">Belize</option>
+                                                            <option value="6.98">Benin</option>
+                                                            <option value="1.23">Bermuda</option>
+                                                            <option value="4.6">Bhutan</option>
+                                                            <option value="40.2">Bolivia</option>
+                                                            <option value="1.7">Bosnia and Herzegovina</option>
+                                                            <option value="10.5">Botswana</option>
+                                                            <option value="9.87">Bouvet Island</option>
+                                                            <option value="4.26">Brazil</option>
+                                                            <option value="6.3">British Indian Ocean Territory</option>
+                                                            <option value="6.3">Brunei Darussalam</option>
+                                                            <option value="6.3">Bulgaria</option>
+                                                            <option value="10.5">Burkina Faso</option>
+                                                            <option value="8.9">Burundi</option>
+                                                            <option value="4.5">Cambodia</option>
+                                                            <option value="3.2">Cameroon</option>
+                                                            <option value="12.00">Canada</option>
+                                                            <option value="6.3">Cape Verde</option>
+                                                            <option value="9.87">Cayman Islands</option>
+                                                            <option value="4.26">Central African Republic</option>
+                                                            <option value="4.26">Chad</option>
+                                                            <option value="6.3">Chile</option>
+                                                            <option value="9.5">China</option>
+                                                            <option value="7.1">Christmas Island</option>
+                                                            <option value="3.5">Cocos (Keeling) Islands</option>
+                                                            <option value="1.1">Colombia</option>
+                                                            <option value="0">Comoros</option>
+                                                            <option value="10.5">Congo</option>
+                                                            <option value="10.5">Congo, The Democratic Republic of The</option>
+                                                            <option value="12.1">Cook Islands</option>
+                                                            <option value="4.9">Costa Rica</option>
+                                                            <option value="8.6">Cote D'ivoire</option>
+                                                            <option value="9.2">Croatia</option>
+                                                            <option value="6.4">Cuba</option>
+                                                            <option value="15.14">Cyprus</option>
+                                                            <option value="9.87">Czech Republic</option>
+                                                            <option value="4.26">Denmark</option>
+                                                            <option value="4.6">Djibouti</option>
+                                                            <option value="9.4">Dominica</option>
+                                                            <option value="7.8">Dominican Republic</option>
+                                                            <option value="7.8">Ecuador</option>
+                                                            <option value="9.2">Egypt</option>
+                                                            <option value="4.5">El Salvador</option>
+                                                            <option value="6.1">Equatorial Guinea</option>
+                                                            <option value="9.3">Eritrea</option>
+                                                            <option value="7.8">Estonia</option>
+                                                            <option value="4.26">Ethiopia</option>
+                                                            <option value="5.32">Falkland Islands (Malvinas)</option>
+                                                            <option value="4.87">Faroe Islands</option>
+                                                            <option value="9.62">Fiji</option>
+                                                            <option value="4.28">Finland</option>
+                                                            <option value="7.8">France</option>
+                                                            <option value="15.48">French Guiana</option>
+                                                            <option value="16.24">French Polynesia</option>
+                                                            <option value="17.15">French Southern Territories</option>
+                                                            <option value="45.48">Gabon</option>
+                                                            <option value="9.12">Gambia</option>
+                                                            <option value="5.35">Georgia</option>
+                                                            <option value="6.32">Germany</option>
+                                                            <option value="4.57">Ghana</option>
+                                                            <option value="8.12">Gibraltar</option>
+                                                            <option value="9.74">Greece</option>
+                                                            <option value="5.4">Greenland</option>
+                                                            <option value="1.48">Grenada</option>
+                                                            <option value="3.2">Guadeloupe</option>
+                                                            <option value="16.45">Guam</option>
+                                                            <option value="9.8">Guatemala</option>
+                                                            <option value="4.5">Guinea</option>
+                                                            <option value="0.58">Guinea-bissau</option>
+                                                            <option value="12.3">Guyana</option>
+                                                            <option value="14.4">Haiti</option>
+                                                            <option value="0.45">Heard Island and Mcdonald Islands</option>
+                                                            <option value="12.8">Holy See (Vatican City State)</option>
+                                                            <option value="8.3">Honduras</option>
+                                                            <option value="4.2">Hong Kong</option>
+                                                            <option value="6.5">Hungary</option>
+                                                            <option value="0.68">Iceland</option>
+                                                            <option value="7.8">India</option>
+                                                            <option value="5.9">Indonesia</option>
+                                                            <option value="6.2">Iran, Islamic Republic of</option>
+                                                            <option value="4.0">Iraq</option>
+                                                            <option value="0.92">Ireland</option>
+                                                            <option value="0.92">Israel</option>
+                                                            <option value="0.92">Italy</option>
+                                                            <option value="0.92">Jamaica</option>
+                                                            <option value="0.92">Japan</option>
+                                                            <option value="12.48">Jordan</option>
+                                                            <option value="48.5">Kazakhstan</option>
+                                                            <option value="12.48">Kenya</option>
+                                                            <option value="12.48">Kiribati</option>
+                                                            <option value="12.48">Korea, Democratic People's Republic of</option>
+                                                            <option value="12.48">Korea, Republic of</option>
+                                                            <option value="12.48">Kuwait</option>
+                                                            <option value="4.56">Kyrgyzstan</option>
+                                                            <option value="4.89">Lao People's Democratic Republic</option>
+                                                            <option value="7.23">Latvia</option>
+                                                            <option value="4.56">Lebanon</option>
+                                                            <option value="13.96">Lesotho</option>
+                                                            <option value="4.56">Liberia</option>
+                                                            <option value="0.58">Libyan Arab Jamahiriya</option>
+                                                            <option value="12.54">Liechtenstein</option>
+                                                            <option value="3.25">Lithuania</option>
+                                                            <option value="9.87">Luxembourg</option>
+                                                            <option value="4.56">Macao</option>
+                                                            <option value="5.4">North Macedonia</option>
+                                                            <option value="1.1">Madagascar</option>
+                                                            <option value="4.56">Malawi</option>
+                                                            <option value="7.62">Malaysia</option>
+                                                            <option value="3.45">Maldives</option>
+                                                            <option value="4.69">Mali</option>
+                                                            <option value="3.68">Malta</option>
+                                                            <option value="4.56">Marshall Islands</option>
+                                                            <option value="1.32">Martinique</option>
+                                                            <option value="8.97">Mauritania</option>
+                                                            <option value="12.45">Mauritius</option>
+                                                            <option value="14.12">Mayotte</option>
+                                                            <option value="4.15">Mexico</option>
+                                                            <option value="5.65">Micronesia, Federated States of</option>
+                                                            <option value="7.98">Moldova, Republic of</option>
+                                                            <option value="4.56">Monaco</option>
+                                                            <option value="3.26">Mongolia</option>
+                                                            <option value="6.52">Montserrat</option>
+                                                            <option value="9.68">Morocco</option>
+                                                            <option value="3.25">Mozambique</option>
+                                                            <option value="5.12">Myanmar</option>
+                                                            <option value="4.96">Namibia</option>
+                                                            <option value="12.45">Nauru</option>
+                                                            <option value="12.45">Nepal</option>
+                                                            <option value="12.45">Netherlands</option>
+                                                            <option value="12.45">Netherlands Antilles</option>
+                                                            <option value="12.45">New Caledonia</option>
+                                                            <option value="7.36">New Zealand</option>
+                                                            <option value="4.85">Nicaragua</option>
+                                                            <option value="7.65">Niger</option>
+                                                            <option value="4.25">Nigeria</option>
+                                                            <option value="1.32">Niue</option>
+                                                            <option value="7.89">Norfolk Island</option>
+                                                            <option value="4.85">Northern Mariana Islands</option>
+                                                            <option value="3.25">Norway</option>
+                                                            <option value="4.56">Oman</option>
+                                                            <option value="16.48">Pakistan</option>
+                                                            <option value="7.89">Palau</option>
+                                                            <option value="9.25">Palestinian Territory, Occupied</option>
+                                                            <option value="4.56">Panama</option>
+                                                            <option value="7.36">Papua New Guinea</option>
+                                                            <option value="7.36">Paraguay</option>
+                                                            <option value="7.36">Peru</option>
+                                                            <option value="3.69">Philippines</option>
+                                                            <option value="17.25">Pitcairn</option>
+                                                            <option value="4.85">Poland</option>
+                                                            <option value="4.85">Portugal</option>
+                                                            <option value="4.36">Puerto Rico</option>
+                                                            <option value="9.62">Qatar</option>
+                                                            <option value="7.36">Reunion</option>
+                                                            <option value="7.36">Romania</option>
+                                                            <option value="7.36">Russian Federation</option>
+                                                            <option value="8.95">Rwanda</option>
+                                                            <option value="7.89">Saint Helena</option>
+                                                            <option value="6.52">Saint Kitts and Nevis</option>
+                                                            <option value="9.32">Saint Lucia</option>
+                                                            <option value="4.58">Saint Pierre and Miquelon</option>
+                                                            <option value="3.69">Saint Vincent and The Grenadines</option>
+                                                            <option value="8.95">Samoa</option>
+                                                            <option value="8.95">San Marino</option>
+                                                            <option value="8.95">Sao Tome and Principe</option>
+                                                            <option value="5.47">Saudi Arabia</option>
+                                                            <option value="8.95">Senegal</option>
+                                                            <option value="8.95">Serbia and Montenegro</option>
+                                                            <option value="2.45">Seychelles</option>
+                                                            <option value="0.59">Sierra Leone</option>
+                                                            <option value="13.58">Singapore</option>
+                                                            <option value="6.25">Slovakia</option>
+                                                            <option value="14.35">Slovenia</option>
+                                                            <option value="2.35">Solomon Islands</option>
+                                                            <option value="0.59">Somalia</option>
+                                                            <option value="0.59">South Africa</option>
+                                                            <option value="0.59">South Georgia and The South Sandwich Islands</option>
+                                                            <option value="0.59">Spain</option>
+                                                            <option value="0.59">Sri Lanka</option>
+                                                            <option value="4.89">Sudan</option>
+                                                            <option value="8.65">Suriname</option>
+                                                            <option value="12.45">Svalbard and Jan Mayen</option>
+                                                            <option value="19.68">Swaziland</option>
+                                                            <option value="24.5">Sweden</option>
+                                                            <option value="7.69">Switzerland</option>
+                                                            <option value="4.32">Syrian Arab Republic</option>
+                                                            <option value="0.59">Taiwan, Province of China</option>
+                                                            <option value="9.87">Tajikistan</option>
+                                                            <option value="4.68">Tanzania, United Republic of</option>
+                                                            <option value="0.59">Thailand</option>
+                                                            <option value="6.54">Timor-leste</option>
+                                                            <option value="7.89">Togo</option>
+                                                            <option value="2.32">Tokelau</option>
+                                                            <option value="6.45">Tonga</option>
+                                                            <option value="7.65">Trinidad and Tobago</option>
+                                                            <option value="5.62">Tunisia</option>
+                                                            <option value="12.00">Turkey</option>
+                                                            <option value="9.68">Turkmenistan</option>
+                                                            <option value="19.52">Turks and Caicos Islands</option>
+                                                            <option value="0.59">Tuvalu</option>
+                                                            <option value="0.59">Uganda</option>
+                                                            <option value="0.59">Ukraine</option>
+                                                            <option value="0.59">United Arab Emirates</option>
+                                                            <option value="0.59">United Kingdom</option>
+                                                            <option value="0.59">United States</option>
+                                                            <option value="1.45">United States Minor Outlying Islands</option>
+                                                            <option value="5.87">Uruguay</option>
+                                                            <option value="3.25">Uzbekistan</option>
+                                                            <option value="4.56">Vanuatu</option>
+                                                            <option value="7.89">Venezuela</option>
+                                                            <option value="6.32">Viet Nam</option>
+                                                            <option value="4.25">Virgin Islands, British</option>
+                                                            <option value="9.68">Virgin Islands, U.S.</option>
+                                                            <option value="4.75">Wallis and Futuna</option>
+                                                            <option value="3.25">Western Sahara</option>
+                                                            <option value="1.68">Yemen</option>
+                                                            <option value="4.30">Zambia</option>
+                                                            <option value="3.39">Zimbabwe</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div id="div_zippostal_txt" style="display:none;">
+                                                            <h5>Zip or postal code</h5>
+                                                            <input class="form-control txtzipcode" type="text" name="txt_shippingcountry" id="txt_shippingcountry" onchange="getOption()" />
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="btn_showhide">
+                                                            <button type="button" style="position:relative; margin-top:10px; margin-bottom:10px;" class="btn_show" name="btn_show" id="btn_show">Learn more about this item</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row" id="">
+                                                    <div id="pnlCostingDeliver" class="col-md-6">
+                                                        <h5>Cost to deliver</h5>
+                                                        <span id="country_estimate_cost" class="output" style="font-weight:normal;font-size:25px">Free</span>
+
+                                                    </div>
+                                                    <div id="pnlEstDeliver" class="col-md-6" style="display:none" id="dv_estimatedays">
+                                                        <h5>Estimated Delivery</h5>
+                                                        <span style="font-weight:normal;font-size:25px">1-4 business days</span>
+                                                    </div>
+                                                </div>
+                                                <br />
+
+
+
+
+                                                @*<button type="button" class="btn_hide" name="btn_hide" id="btn_hide">Hide</button>*@
+                                            }
+
+
+                                        </div>
+
+                                        <hr />
+                                        @*@Html.Partial("_DeliveryInfo")*@
+
+                                        <div class="row">
+
+
+                                            @*<div class="col-lg-3">
+                                                    <h5>Ready to ship in</h5><br />
+                                                    <h3>1-2 business days</h3>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <h5>From</h5><br />
+                                                    <h3>United Kingdom</h3>
+                                                </div>*@
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="overview">
+                                    <div style="border:solid 3px #bdbbbb;padding:7px">
+                                        <div class="panel-heading">
+                                            <h1 class="h_product_name">@Model.Name</h1>
+                                        </div>
+                                        @if (!String.IsNullOrEmpty(Model.ShortDescription))
+                                        {
+                                            <div class="short-description" id="short_description">
+                                                <h5>Short description</h5>
+                                                @Model.ShortDescription
+                                            </div>
+                                            <!--availability-->
+                                            @Html.Partial("_Availability", Model)
+                                            var dataDictPrice = new ViewDataDictionary();
+                                            dataDictPrice.TemplateInfo.HtmlFieldPrefix = string.Format("price_{0}", Model.Id);
+                                            <div class="product_price" style="color:#222">
+                                                @Html.Partial("_ProductPrice", Model.ProductPrice, dataDictPrice)
+                                            </div>
+
+                                        }
+                                        @{
+                                            var dataDictAttributes = new ViewDataDictionary();
+                                            dataDictAttributes.TemplateInfo.HtmlFieldPrefix = string.Format("attributes_{0}", Model.Id);
+                                            @Html.Partial("_ProductAttributes", Model.ProductAttributes, dataDictAttributes)
+                                        }
+                                        @Html.Widget("productdetails_overview_top")
+                                        <!--product SKU, manufacturer part number, stock info-->
+                                        @Html.Partial("_SKU_Man_Stock", Model)
+                                        <!--Back in stock subscription-->
+                                        @Html.Partial("_BackInStockSubscription", Model)
+                                        <!--product manufacturers-->
+                                        @Html.Partial("_ProductManufacturers", Model.ProductManufacturers)
+                                        <!--product reviews-->
+                                        <!--SKU, MAN, GTIN, vendor-->
+                                        @Html.Partial("_SKU_Man_GTIN_Ven", Model)
+                                        <!--delivery-->
+                                        @Html.Partial("_DeliveryInfo", Model)
+                                        @Html.Partial("_ProductReviewOverview", Model.ProductReviewOverview)
+                                        <!--sample download-->
+                                        @Html.Partial("_DownloadSample", Model)
+                                        <!--attributes-->
+                                        <!--gift card-->
+                                        @{
+                                            var dataDictGiftCard = new ViewDataDictionary();
+                                            dataDictGiftCard.TemplateInfo.HtmlFieldPrefix = string.Format("giftcard_{0}", Model.Id);
+                                            @Html.Partial("_GiftCardInfo", Model.GiftCard, dataDictGiftCard)
+                                        }
+                                        <!--rental info-->
+                                        @{
+                                            var dataDictRental = new ViewDataDictionary();
+                                            dataDictRental.TemplateInfo.HtmlFieldPrefix = string.Format("rental_{0}", Model.Id);
+                                            @Html.Partial("_RentalInfo", Model, dataDictRental)
+                                        }
+                                        <!--price & add to cart    03012022 "called to add to cart partial view X2 resolved issue with make offer button line 766@html.part("..... -->
+                                        <div id="divcart">
+
+                                            @{
+                                                @*var dataDictPrice = new ViewDataDictionary();
+                                                    dataDictPrice.TemplateInfo.HtmlFieldPrefix = string.Format("price_{0}", Model.Id);
+                                                    @Html.Partial("_ProductPrice", Model.ProductPrice, dataDictPrice)*@
+
+
+
+                                                //var dataDictAddToCart = new ViewDataDictionary();
+                                                dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = string.Format("addtocart_{0}", Model.Id);
+                                                //  @Html.Partial("_AddToCart", Model.AddToCart, dataDictAddToCart)
+                                            }
+                                        </div>
+                                        <!--<button type="button" class="btn btn-lg" style="background-color:#000080;color:white" onclick="AjaxCart.OpenOfferPopup(207);return false;">1131Make offer</button>-->
+                                        <br />
+                                        <div class="emailCompare-btn">
+                                            @Html.Partial("_ProductEmailAFriendButton", Model)
+                                            @Html.Partial("_CompareProductsButton", Model)
+
+                                        </div>
+                                        @Html.Partial("_ShareButton", Model)
+                                    </div>
+                                    @Html.Widget("productdetails_overview_bottom")
+                                    <br />
+                                    @if (!String.IsNullOrEmpty(Model.FullDescription))
+                                    {
+                                        <p class="full_description" id="full_description">
+                                            <h5>Description</h5>
+                                            @Html.Raw(Model.FullDescription) <!-- , new { class = "description" } -->
+                                        </p>
+                                        <div class="btn_showhide">
+                                            <button type="button" class="btn_show" name="btn_show" id="btn_show">Learn more about this item</button>
+                                        </div>
+                                        <button type="button" class="btn_hide" name="btn_hide" id="btn_hide">Hide</button>
+                                    }
+                                    <!-- Delivery Info After Full Description -->
+                                    @*@Html.Partial("_DeliveryInfo")*@
+
+                                    <div class="row" style="padding-top:50px">
+                                        <div class="col-lg-4"></div>
+                                        <div class="col-lg-3" style="display:none" id="dv_estimatedays">
+                                            <h5>Estimated Delivery</h5><br />
+                                            <h3>1-4 business days</h3>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <h5>Ready to ship in</h5><br />
+                                            <h3>1-2 business days</h3>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <h5>From</h5><br />
+                                            <h3>United Kingdom</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+
+                        <br />
+                        @*<div class="row" style="padding-left:53%">
+                                <div class="col-lg-7"></div>
+                                <div class="col-lg-3">
+                                    <h5>Cost to deliver</h5>
+                                    <span id="country_estimate_cost" class="output" style="font-weight:bold;font-size:16px">Free</span>
+                                </div>
+                                <div class="col-lg-2"></div>
+                            </div>*@
+                        <br />
+                        @*<div class="row" style="padding-left:53%">
+                                <div class="col-lg-7"></div>
+                                <div class="col-lg-3">
+                                    <button type="button" class="btnGetShipCost" id="btn_getshipcost" name="btn_getshipcost">Get shipping cost <i class="fa fa-caret-down"></i></button>
+                                </div>
+                                <div class="col-lg-2"></div>
+                            </div>*@
+                        @*<br />
+                            <div class="row" id="div_country_txt" style="display:none;padding-left:53%">
+                                <div class="col-lg-7"></div>
+                                <div class="col-lg-5">
+                                    <h5>Country</h5>
+                                    <select class="form-control" name="txt_shippingcountry" id="txt_shippingcountry" onclick="getOption()" style="width:50%">
+                                        <option value="" selected="selected">Sele ct Country</option>
+                                        <option value="14.54">United States</option>
+                                        <option value="Free">United Kingdom</option>
+                                        <option value="16.40">Afghanistan</option>
+                                        <option value="10.65">Albania</option>
+                                        <option value="50.44">Algeria</option>
+                                        <option value="07.45">American Samoa</option>
+                                        <option value="12.64">Andorra</option>
+                                        <option value="21.32">Angola</option>
+                                        <option value="12.32">Anguilla</option>
+                                        <option value="9.8">Antarctica</option>
+                                        <option value="4.6">Antigua and Barbuda</option>
+                                        <option value="10.5">Argentina</option>
+                                        <option value="13.00">Armenia</option>
+                                        <option value="12.46">Aruba</option>
+                                        <option value="4.8">Australia</option>
+                                        <option value="16.38">Austria</option>
+                                        <option value="3.2">Azerbaijan</option>
+                                        <option value="4.8">Bahamas</option>
+                                        <option value="7.23">Bahrain</option>
+                                        <option value="4.64">Bangladesh</option>
+                                        <option value="8.00">Barbados</option>
+                                        <option value="12.00">Belarus</option>
+                                        <option value="12.48">Belgium</option>
+                                        <option value="7.54">Belize</option>
+                                        <option value="6.98">Benin</option>
+                                        <option value="1.23">Bermuda</option>
+                                        <option value="4.6">Bhutan</option>
+                                        <option value="40.2">Bolivia</option>
+                                        <option value="1.7">Bosnia and Herzegovina</option>
+                                        <option value="10.5">Botswana</option>
+                                        <option value="9.87">Bouvet Island</option>
+                                        <option value="4.26">Brazil</option>
+                                        <option value="6.3">British Indian Ocean Territory</option>
+                                        <option value="6.3">Brunei Darussalam</option>
+                                        <option value="6.3">Bulgaria</option>
+                                        <option value="10.5">Burkina Faso</option>
+                                        <option value="8.9">Burundi</option>
+                                        <option value="4.5">Cambodia</option>
+                                        <option value="3.2">Cameroon</option>
+                                        <option value="12.00">Canada</option>
+                                        <option value="6.3">Cape Verde</option>
+                                        <option value="9.87">Cayman Islands</option>
+                                        <option value="4.26">Central African Republic</option>
+                                        <option value="4.26">Chad</option>
+                                        <option value="6.3">Chile</option>
+                                        <option value="9.5">China</option>
+                                        <option value="7.1">Christmas Island</option>
+                                        <option value="3.5">Cocos (Keeling) Islands</option>
+                                        <option value="1.1">Colombia</option>
+                                        <option value="0">Comoros</option>
+                                        <option value="10.5">Congo</option>
+                                        <option value="10.5">Congo, The Democratic Republic of The</option>
+                                        <option value="12.1">Cook Islands</option>
+                                        <option value="4.9">Costa Rica</option>
+                                        <option value="8.6">Cote D'ivoire</option>
+                                        <option value="9.2">Croatia</option>
+                                        <option value="6.4">Cuba</option>
+                                        <option value="15.14">Cyprus</option>
+                                        <option value="9.87">Czech Republic</option>
+                                        <option value="4.26">Denmark</option>
+                                        <option value="4.6">Djibouti</option>
+                                        <option value="9.4">Dominica</option>
+                                        <option value="7.8">Dominican Republic</option>
+                                        <option value="7.8">Ecuador</option>
+                                        <option value="9.2">Egypt</option>
+                                        <option value="4.5">El Salvador</option>
+                                        <option value="6.1">Equatorial Guinea</option>
+                                        <option value="9.3">Eritrea</option>
+                                        <option value="7.8">Estonia</option>
+                                        <option value="4.26">Ethiopia</option>
+                                        <option value="5.32">Falkland Islands (Malvinas)</option>
+                                        <option value="4.87">Faroe Islands</option>
+                                        <option value="9.62">Fiji</option>
+                                        <option value="4.28">Finland</option>
+                                        <option value="7.8">France</option>
+                                        <option value="15.48">French Guiana</option>
+                                        <option value="16.24">French Polynesia</option>
+                                        <option value="17.15">French Southern Territories</option>
+                                        <option value="45.48">Gabon</option>
+                                        <option value="9.12">Gambia</option>
+                                        <option value="5.35">Georgia</option>
+                                        <option value="6.32">Germany</option>
+                                        <option value="4.57">Ghana</option>
+                                        <option value="8.12">Gibraltar</option>
+                                        <option value="9.74">Greece</option>
+                                        <option value="5.4">Greenland</option>
+                                        <option value="1.48">Grenada</option>
+                                        <option value="3.2">Guadeloupe</option>
+                                        <option value="16.45">Guam</option>
+                                        <option value="9.8">Guatemala</option>
+                                        <option value="4.5">Guinea</option>
+                                        <option value="0.58">Guinea-bissau</option>
+                                        <option value="12.3">Guyana</option>
+                                        <option value="14.4">Haiti</option>
+                                        <option value="0.45">Heard Island and Mcdonald Islands</option>
+                                        <option value="12.8">Holy See (Vatican City State)</option>
+                                        <option value="8.3">Honduras</option>
+                                        <option value="4.2">Hong Kong</option>
+                                        <option value="6.5">Hungary</option>
+                                        <option value="0.68">Iceland</option>
+                                        <option value="7.8">India</option>
+                                        <option value="5.9">Indonesia</option>
+                                        <option value="6.2">Iran, Islamic Republic of</option>
+                                        <option value="4.0">Iraq</option>
+                                        <option value="0.92">Ireland</option>
+                                        <option value="0.92">Israel</option>
+                                        <option value="0.92">Italy</option>
+                                        <option value="0.92">Jamaica</option>
+                                        <option value="0.92">Japan</option>
+                                        <option value="12.48">Jordan</option>
+                                        <option value="48.5">Kazakhstan</option>
+                                        <option value="12.48">Kenya</option>
+                                        <option value="12.48">Kiribati</option>
+                                        <option value="12.48">Korea, Democratic People's Republic of</option>
+                                        <option value="12.48">Korea, Republic of</option>
+                                        <option value="12.48">Kuwait</option>
+                                        <option value="4.56">Kyrgyzstan</option>
+                                        <option value="4.89">Lao People's Democratic Republic</option>
+                                        <option value="7.23">Latvia</option>
+                                        <option value="4.56">Lebanon</option>
+                                        <option value="13.96">Lesotho</option>
+                                        <option value="4.56">Liberia</option>
+                                        <option value="0.58">Libyan Arab Jamahiriya</option>
+                                        <option value="12.54">Liechtenstein</option>
+                                        <option value="3.25">Lithuania</option>
+                                        <option value="9.87">Luxembourg</option>
+                                        <option value="4.56">Macao</option>
+                                        <option value="5.4">North Macedonia</option>
+                                        <option value="1.1">Madagascar</option>
+                                        <option value="4.56">Malawi</option>
+                                        <option value="7.62">Malaysia</option>
+                                        <option value="3.45">Maldives</option>
+                                        <option value="4.69">Mali</option>
+                                        <option value="3.68">Malta</option>
+                                        <option value="4.56">Marshall Islands</option>
+                                        <option value="1.32">Martinique</option>
+                                        <option value="8.97">Mauritania</option>
+                                        <option value="12.45">Mauritius</option>
+                                        <option value="14.12">Mayotte</option>
+                                        <option value="4.15">Mexico</option>
+                                        <option value="5.65">Micronesia, Federated States of</option>
+                                        <option value="7.98">Moldova, Republic of</option>
+                                        <option value="4.56">Monaco</option>
+                                        <option value="3.26">Mongolia</option>
+                                        <option value="6.52">Montserrat</option>
+                                        <option value="9.68">Morocco</option>
+                                        <option value="3.25">Mozambique</option>
+                                        <option value="5.12">Myanmar</option>
+                                        <option value="4.96">Namibia</option>
+                                        <option value="12.45">Nauru</option>
+                                        <option value="12.45">Nepal</option>
+                                        <option value="12.45">Netherlands</option>
+                                        <option value="12.45">Netherlands Antilles</option>
+                                        <option value="12.45">New Caledonia</option>
+                                        <option value="7.36">New Zealand</option>
+                                        <option value="4.85">Nicaragua</option>
+                                        <option value="7.65">Niger</option>
+                                        <option value="4.25">Nigeria</option>
+                                        <option value="1.32">Niue</option>
+                                        <option value="7.89">Norfolk Island</option>
+                                        <option value="4.85">Northern Mariana Islands</option>
+                                        <option value="3.25">Norway</option>
+                                        <option value="4.56">Oman</option>
+                                        <option value="16.48">Pakistan</option>
+                                        <option value="7.89">Palau</option>
+                                        <option value="9.25">Palestinian Territory, Occupied</option>
+                                        <option value="4.56">Panama</option>
+                                        <option value="7.36">Papua New Guinea</option>
+                                        <option value="7.36">Paraguay</option>
+                                        <option value="7.36">Peru</option>
+                                        <option value="3.69">Philippines</option>
+                                        <option value="17.25">Pitcairn</option>
+                                        <option value="4.85">Poland</option>
+                                        <option value="4.85">Portugal</option>
+                                        <option value="4.36">Puerto Rico</option>
+                                        <option value="9.62">Qatar</option>
+                                        <option value="7.36">Reunion</option>
+                                        <option value="7.36">Romania</option>
+                                        <option value="7.36">Russian Federation</option>
+                                        <option value="8.95">Rwanda</option>
+                                        <option value="7.89">Saint Helena</option>
+                                        <option value="6.52">Saint Kitts and Nevis</option>
+                                        <option value="9.32">Saint Lucia</option>
+                                        <option value="4.58">Saint Pierre and Miquelon</option>
+                                        <option value="3.69">Saint Vincent and The Grenadines</option>
+                                        <option value="8.95">Samoa</option>
+                                        <option value="8.95">San Marino</option>
+                                        <option value="8.95">Sao Tome and Principe</option>
+                                        <option value="5.47">Saudi Arabia</option>
+                                        <option value="8.95">Senegal</option>
+                                        <option value="8.95">Serbia and Montenegro</option>
+                                        <option value="2.45">Seychelles</option>
+                                        <option value="0.59">Sierra Leone</option>
+                                        <option value="13.58">Singapore</option>
+                                        <option value="6.25">Slovakia</option>
+                                        <option value="14.35">Slovenia</option>
+                                        <option value="2.35">Solomon Islands</option>
+                                        <option value="0.59">Somalia</option>
+                                        <option value="0.59">South Africa</option>
+                                        <option value="0.59">South Georgia and The South Sandwich Islands</option>
+                                        <option value="0.59">Spain</option>
+                                        <option value="0.59">Sri Lanka</option>
+                                        <option value="4.89">Sudan</option>
+                                        <option value="8.65">Suriname</option>
+                                        <option value="12.45">Svalbard and Jan Mayen</option>
+                                        <option value="19.68">Swaziland</option>
+                                        <option value="24.5">Sweden</option>
+                                        <option value="7.69">Switzerland</option>
+                                        <option value="4.32">Syrian Arab Republic</option>
+                                        <option value="0.59">Taiwan, Province of China</option>
+                                        <option value="9.87">Tajikistan</option>
+                                        <option value="4.68">Tanzania, United Republic of</option>
+                                        <option value="0.59">Thailand</option>
+                                        <option value="6.54">Timor-leste</option>
+                                        <option value="7.89">Togo</option>
+                                        <option value="2.32">Tokelau</option>
+                                        <option value="6.45">Tonga</option>
+                                        <option value="7.65">Trinidad and Tobago</option>
+                                        <option value="5.62">Tunisia</option>
+                                        <option value="12.00">Turkey</option>
+                                        <option value="9.68">Turkmenistan</option>
+                                        <option value="19.52">Turks and Caicos Islands</option>
+                                        <option value="0.59">Tuvalu</option>
+                                        <option value="0.59">Uganda</option>
+                                        <option value="0.59">Ukraine</option>
+                                        <option value="0.59">United Arab Emirates</option>
+                                        <option value="0.59">United Kingdom</option>
+                                        <option value="0.59">United States</option>
+                                        <option value="1.45">United States Minor Outlying Islands</option>
+                                        <option value="5.87">Uruguay</option>
+                                        <option value="3.25">Uzbekistan</option>
+                                        <option value="4.56">Vanuatu</option>
+                                        <option value="7.89">Venezuela</option>
+                                        <option value="6.32">Viet Nam</option>
+                                        <option value="4.25">Virgin Islands, British</option>
+                                        <option value="9.68">Virgin Islands, U.S.</option>
+                                        <option value="4.75">Wallis and Futuna</option>
+                                        <option value="3.25">Western Sahara</option>
+                                        <option value="1.68">Yemen</option>
+                                        <option value="4.30">Zambia</option>
+                                        <option value="3.39">Zimbabwe</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row" id="div_zippostal_txt" style="display:none;padding-left:53%">
+                                <div class="col-lg-7"></div>
+                                <div class="col-lg-5">
+                                    <h5>Zip or postal code</h5>
+                                    <input class="form-control" type="text" name="txt_shippingcountry" id="txt_shippingcountry" style="width:50%" />
+                                </div>
+                            </div>
+                            <br />*@
+                        @*<div class="row">
+                                <div class="col-lg-7"></div>
+                                <div class="col-lg-5">
+                                    <a class="btn_shoppolicies" href="http://localhost:15536/privacy-notice">View shop policies</a>
+                                </div>
+                            </div>*@
+
+                        @*<div class="clearfix"></div>*@
+                        @*<ul class="nav nav-tabs">
+                                @if (!String.IsNullOrEmpty(Model.FullDescription))
+                                {
+
+                                    <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+                                }
+                                @if (!String.IsNullOrEmpty(@Html.Partial("_ProductSpecifications", Model.ProductSpecifications).ToString()))
+                                {
+
+                                    <li><a href="#specification" data-toggle="tab">Specifications</a></li>
+                                }
+                                @if (!String.IsNullOrEmpty(@Html.Partial("_ProductTags", Model.ProductTags).ToString()))
+                                {
+                                    <li><a href="#tags" data-toggle="tab">Products Tags</a></li>
+                                }
+                            </ul>*@
+
+                        @*<div class="tab-content">
+                                @if (!String.IsNullOrEmpty(Model.FullDescription))
+                                    {
+                                        <div class="full-description tab-pane active" id="description" itemprop="description">
+                                            @Html.Raw(Model.FullDescription)
+                                        </div>
+                                    }
+                                @if (!String.IsNullOrEmpty(@Html.Partial("_ProductSpecifications", Model.ProductSpecifications).ToString()))
+                                {
+                                    <div class="full-description tab-pane" id="specification">
+                                        @Html.Partial("_ProductSpecifications", Model.ProductSpecifications)
+                                    </div>
+                                }
+                                @if (!String.IsNullOrEmpty(@Html.Partial("_ProductTags", Model.ProductTags).ToString()))
+                                {
+                                    <div class="full-description tab-pane" id="tags">
+                                        @Html.Partial("_ProductTags", Model.ProductTags)
+                                    </div>
+                                }
+                            </div>*@
+                    </div>
+
+                    @Html.Widget("productdetails_before_collateral")
+                    @Html.Partial("_ProductTierPrices", Model.TierPrices)
+                </div>
+
+            }
+
+            @Html.Widget("productdetails_bottom")
+        </div>
+
+    </div>
+    <div class="product-collateral">
+        @Html.Action("ProductsAlsoPurchased", "Product", new { productId = Model.Id })
+        @Html.Action("RelatedProducts", "Product", new { productId = Model.Id })
+    </div>
+
+</div>
+<script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if ((panel.style != undefined) && (panel.style.display === "block")) {
+                panel.style.display = "none";
+            } else {
+                panel.style.display = "block";
+            }
+        });
+    }
+</script>
+<script>
+
+    function increaseValue() {
+        var value = parseInt(document.getElementById('number').value, 10);
+        value = isNaN(value) ? 0 : value;
+        value++;
+        document.getElementById('number').value = value;
+    }
+
+    function decreaseValue() {
+        var value = parseInt(document.getElementById('number').value, 10);
+        value = isNaN(value) ? 0 : value;
+        value < 1 ? value = 1 : '';
+        value--;
+        document.getElementById('number').value = value;
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $(".btnGetShipCost").click(function () {
+            $("#div_country_txt").show();
+            $("#div_zippostal_txt").show();
+
+        });
+        $("#pnlCostingDeliver").hide();
+        $("#pnlEstDeliver").hide();
+        $(".txtzipcode").change(function () {
+            $("#pnlEstDeliver").show();
+            $("#pnlCostingDeliver").show();
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    function getOption() {
+        document.getElementById("pnlCostingDeliver").style.display = "block";
+          selectElement = document.querySelector('#txt_shippingcountry');
+
+          output = selectElement.options[selectElement.selectedIndex].value;
+
+          document.querySelector('.output').textContent = output;
+
+          @ViewBag.CountryEstimateCost = "output";
+     }
+</script>
+
+<script>
+    $(document).ready(function () {
+        var isShow = false;
+
+        //$("ul").hide();
+        $("p").hide();
+        $(".btnGetShipCost").hide();
+        //var btntxt = $(".btn_show").html("Learn more about this item");
+        $(".btn_show").click(function () {
+            //$("ul").hide(500);
+            //$("p").hide(500);
+            $("p").toggle(500);
+            //$("ul").toggle(500);
+            //if (btntxt == "Learn more about this item") {
+            $(".btn_show").html("Less");
+            $(".btnGetShipCost").show();
+
+            if (!isShow) {
+                $(".btnGetShipCost").show();
+                isShow = true;
+                $("#div_country_txt").show();
+                $("#div_zippostal_txt").show();
+            }
+            else {
+
+                $(".btnGetShipCost").hide();
+                isShow = false;
+                $("#div_country_txt").hide();
+                $("#div_zippostal_txt").hide();
+            }
+
+
+
+            //}
+            //else
+            //{
+            //    $(".btn_show").html("Learn more about this item");
+            //}
+
+            //$(".btn_show").html("Button New Text");
+        });
+        //$(".btn_show").click(function () {
+        //    //$("ul").show(500);
+        //    //$("p").show(500);
+        //    //$("btn_show").hide();
+        //    $("p").toggle();
+        //});
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        var isShow = false;
+
+        //$("ul").hide();
+        $("p").hide();
+        //var btntxt = $(".btn_show").html("Learn more about this item");
+        $(".btn_showD").click(function () {
+            //$("ul").hide(500);
+            //$("p").hide(500);
+            $("p").toggle(500);
+            //$("ul").toggle(500);
+            //if (btntxt == "Learn more about this item") {
+            if ($(".btn_showD").html() == "Less")
+                $(".btn_showD").html("Learn more about this item");
+            else
+                $(".btn_showD").html("Less");
+
+        });
+    });
+</script>
+
+<script type="text/javascript">
+
+    var x = document.getElementById("dv_estimatedays");
+    function getOption() {
+        selectElement = document.querySelector('#txt_shippingcountry');
+
+        output =
+            selectElement.options[selectElement.selectedIndex].value;
+
+        document.querySelector('.output').textContent = output;
+
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+
+    }
+</script>
+
+
+
+
+@*<script>
+        $(document).ready(function () {
+            //var a = document.getElementsByClassName("dv_description");
+            var btn1 = document.getElementsByClassName("btn_hide");
+            var btn2 = document.getElementsByClassName("btn_show");
+
+            btn1.click(function () {
+                $("p").hide();
+            });
+            btn2.click(function () {
+                $("p").show();
+            });
+        });
+    </script>*@

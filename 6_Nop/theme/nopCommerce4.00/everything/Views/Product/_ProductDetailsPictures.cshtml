@@ -1,0 +1,63 @@
+﻿@model ProductDetailsModel
+@{
+    Html.AddScriptParts(ResourceLocation.Footer, "http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Themes/everything/Content/js/ProductZoom.js");
+    Html.AddCssFileParts("~/Themes/everything/Content/css/ProductZoom.css");
+}
+<div class="gallery">
+    <div class="picture image-box">
+        @if (Model.DefaultPictureZoomEnabled)
+        {
+          <div class="targetarea">  
+            @*<a href="@Model.DefaultPictureModel.FullSizeImageUrl" title="@Model.DefaultPictureModel.Title" id="productzoom">*@
+                <img alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" itemprop="image" id="productzoom" />
+            @*</a>*@
+          </div>
+             @*<script type="text/javascript" asp-location="Footer">
+                $(document).ready(function () {
+                    $('#main-product-img-lightbox-anchor-@Model.Id').magnificPopup(
+                    {
+                        type: 'image',
+                        removalDelay: 300,
+                        gallery: {
+                            enabled: true,
+                            tPrev: '@T("Media.MagnificPopup.Previous")',
+                            tNext: '@T("Media.MagnificPopup.Next")',
+                            tCounter: '@T("Media.MagnificPopup.Counter")'
+                        },
+                        tClose: '@T("Media.MagnificPopup.Close")',
+                        tLoading: '@T("Media.MagnificPopup.Loading")'
+                    });
+                });
+            </script>*@
+        }
+        else
+        {
+            <img id="productzoom" alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" itemprop="image" />
+        }
+    </div>
+    @if (Model.PictureModels.Count > 1)
+    {
+        <ul>
+            @foreach (var picture in Model.PictureModels)
+            {
+                <li class="product-thumb productzoom thumbs">
+                <a class="thumb-popup-link thumb-item" href="@picture.FullSizeImageUrl" data-large="@picture.FullSizeImageUrl" data-title="@picture.ImageUrl">
+                    <img src="@picture.ThumbImageUrl" alt="@picture.AlternateText" title="@picture.Title" />
+                </a>
+                </li>
+            }
+        </ul>
+        @*<script type="text/javascript" asp-location="Footer">
+            $(document).ready(function () {
+                $('.thumb-item img').on('click', function () {
+                    $('#main-product-img-@Model.Id').attr('src', $(this).attr('data-defaultsize'));
+                    $('#main-product-img-@Model.Id').attr('title', $(this).attr('title'));
+                    $('#main-product-img-@Model.Id').attr('alt', $(this).attr('alt'));
+                    $('#main-product-img-lightbox-anchor-@Model.Id').attr('href', $(this).attr('data-fullsize'));
+                    $('#main-product-img-lightbox-anchor-@Model.Id').attr('title', $(this).attr('title'));
+                });
+            });
+        </script>*@
+    }
+</div>

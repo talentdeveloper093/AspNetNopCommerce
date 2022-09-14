@@ -1,0 +1,11 @@
+{
+  "Group": "ExternalAuth methods",
+  "FriendlyName": "Google authentication",
+  "SystemName": "PS.ExternalAuth.Google",
+  "Version": "1",
+  "SupportedVersions": [ "4.10" ],
+  "Author": "Fredrik Rudberg",
+  "DisplayOrder": 1,
+  "FileName": "PS.Nop.Plugin.ExternalAuth.Google.dll",
+  "Description": "This plugin enables you to login using Google"
+}

@@ -1,0 +1,185 @@
+﻿@model ProductDetailsModel.AddToCartModel
+@using Nop.Web.Models.Catalog;
+@using Nop.Core.Domain.Orders;
+
+<style>
+    button[name="btn_addtocart"] {
+        background-color: #222222;
+        width: 128px;
+        height: 40px;
+        border-radius: 20px;
+        font-size: 10px
+    }
+
+        button[name="btn_addtocart"]:hover {
+            background-color: #414141;
+            color: white;
+        }
+
+    .CustomBtnStyling {
+        border: none;
+        background-color: #4ab2f1;
+        padding: 10px 10px;
+        margin: 2px;
+        text-align: center;
+        font-size: 15px;
+        color: #fff;
+        text-transform: uppercase;
+    }
+
+    .MakeOfferbtnClr {
+        background-color: #414C89 !important;
+    }
+</style>
+
+<div class="add-to-cart">
+    @if (Model.UpdatedShoppingCartItemId > 0)
+    {
+        @Html.HiddenFor(x => x.UpdatedShoppingCartItemId)
+    }
+    @if (Model.CustomerEntersPrice)
+    {
+        <div class="customer-entered-price">
+            <div class="price-input form-group row">
+                <div class="col-md-6 paddding-right0">
+                    @Html.LabelFor(model => model.CustomerEnteredPrice, new { @class = "enter-price-label" }, ":")
+                    @*round price*@
+                </div>
+                <div class="col-md-4 paddding-left0">
+                    @Html.TextBox("CustomerEnteredPrice", Convert.ToInt32(Math.Ceiling(Model.CustomerEnteredPrice)), new { @class = "enter-price-input, form-control" })
+                </div>
+            </div>
+            <div class="price-range form-group row">
+                <div class="col-md-12 text-info">
+                    <strong>@Model.CustomerEnteredPriceRange</strong>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.DisableBuyButton || !Model.DisableWishlistButton)
+    {
+        <div class="add-to-cart-panel row"  style="margin-top:-58px;">
+            <div class="form-group col-12" @*style="position: relative; margin-top: -54px;"*@>
+                <div class="qtyLabel" @*style="display: inline-block; vertical-align: top;margin-top:2%"*@>
+                    @*@Html.LabelFor(model => model.EnteredQuantity, new { @class = "qty-label" }, ":")*@
+                    <label for="giftcard_1_Message">Quantity: @Html.TextBoxFor(model => model.EnteredQuantity, new { style = "width:42px;padding: 10px 15px;border: none;border-radius: 4px;background: #e1e1e1;    text-align: center;" }) </label>
+
+                    @*<hr style="border-top:1px solid black" />*@
+                </div>
+                @if (Model.AllowedQuantities.Count > 0)
+                {
+                    <div class="col-md-3">
+                        @Html.DropDownListFor(model => model.EnteredQuantity, Model.AllowedQuantities, new { @class = "qty-dropdown form-control" })
+                    </div>
+                }
+                else
+                {
+                    <br />
+
+
+                    //when a customer clicks 'Enter' button we submit the "add to cart" button (if visible)
+                    if (!Model.DisableBuyButton)
+                    {
+                        <script type="text/javascript">
+                            $(document).ready(function() {
+                                $("#@Html.FieldIdFor(model => model.EnteredQuantity)").keydown(function(event) {
+                                    if (event.keyCode == 13) {
+                                        $("#add-to-cart-button-@Model.ProductId").click();
+                                        return false;
+                                    }
+                                });
+                            });
+                        </script>
+                    }
+
+                }
+
+                @if (!Model.DisableBuyButton)
+                {
+
+                    var addToCartText = "";
+                    if (Model.UpdatedShoppingCartItemId > 0 && Model.UpdateShoppingCartItemType.HasValue && Model.UpdateShoppingCartItemType.Value == ShoppingCartType.ShoppingCart)
+                    {
+                        addToCartText = T("ShoppingCart.AddToCart.Update").Text;
+                    }
+                    else
+                    {
+                        addToCartText = T("ShoppingCart.AddToCart").Text;
+                        if (Model.IsRental)
+                        {
+                            addToCartText = T("ShoppingCart.Rent").Text;
+                        }
+                        if (Model.AvailableForPreOrder)
+                        {
+                            addToCartText = T("ShoppingCart.PreOrder").Text;
+                        }
+                    }
+
+                    <br />
+                    <div  class="col-12">
+                        <div class="row">
+
+                            <div class="col-lg-12">
+
+                                <div class="cartButton">
+                                    <!--add-to-cart-button-->
+                                    @*<button name="btn_addtocart" type="button" id="add-to-cart-button-@Model.ProductId" style=" border: 1px solid #2dace1; background:#2dace1!important; border-radius: 6px!important;     height: 42px;" class="btn btn-default" data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_details('@Url.RouteUrl("AddProductToCart-Details", new { productId = Model.ProductId, shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart })', '#product-details-form');return false;"><i class="fa fa-shopping-cart fa-fw"></i> @addToCartText </button>*@
+                                    <a href="cart" name="btn_addtocart" id="add-to-cart-button-@Model.ProductId" data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_details('@Url.RouteUrl("AddProductToCart-Details", new { productId = Model.ProductId, shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart })', '#product-details-form');return false;">
+                                        <div class="buy-now-btn" style="margin-top:1px !important;">
+                                            <span class="glyphicon glyphicon-shopping-cart"></span> @addToCartText
+
+
+                                        </div>
+                                    </a>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr style="border-top:1px solid #bdbbbb;margin-top:1px" />
+
+                    if (Model.IsMakeOffer)
+                    { <div class="add-to-cart-panel">
+
+
+
+                            <!----<input type="button" class="btn btn-lg" style="margin-top:-10px;margin-left: 51%;background-color:#ff0000;color:white;width: 128px;height: 40px;border-radius: 20px;font-size: 10px" value="MAKE OFFER" data-productid="@Model.ProductId" onclick="AjaxCart.OpenOfferPopup(@Model.ProductId)" /> -->
+
+                        </div>
+
+                    }
+
+                }
+            </div>
+
+                </div>
+
+    }
+    @Html.Widget("productdetails_add_info")
+</div>
+@if (!Model.DisableWishlistButton && Model.UpdatedShoppingCartItemId == 0)
+{
+
+}
+
+@*<div class="wishlist-btn">
+        <button type="button" id="add-to-wishlist-button-@Model.ProductId" class="btn btn-default add-to-wishlist-button " data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_details('@Url.RouteUrl("AddProductToCart-Details", new { productId = Model.ProductId, shoppingCartTypeId = (int)ShoppingCartType.Wishlist })', '#product-details-form');return false;"><i class="fa fa-heart fa-fw"></i> @T("ShoppingCart.AddToWishlist") </button>
+    </div>*@
+
+
+<div id="OfferModal" title="Make Offer" style='display:none'>
+    <input type="hidden" id="hiddenproductid" />
+
+    <span>Your Price:</span>
+    <span> <input type="number" id="OfferModaltxtbx" /></span>
+    <span>Notes for Seller:</span>
+    <span>
+        <textarea cols="19" rows="7" style="min-height:50px;" id="messagetosellerbx"></textarea>
+    </span>
+    <span>
+        <button class="CustomBtnStyling"  onclick="AjaxCart.Submitoffer('@Url.RouteUrl("SubmitOffer")');return false;">Submit</button>
+       
+    </span>
+</div>

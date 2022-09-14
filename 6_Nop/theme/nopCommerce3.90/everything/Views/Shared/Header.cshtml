@@ -1,0 +1,41 @@
+﻿<header>
+    <div class="navbar navbar-default topbar" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".test">
+                    <span class="sr-only">Toggle navigation</span>
+                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse test">
+                @Html.Widget("header")
+                @Html.Action("HeaderLinks", "Common")
+                @*@Html.Action("FlyoutShoppingCart", "ShoppingCart")*@
+            </div>
+        </div>
+    </div>
+    @Html.Widget("bsmegamenu")
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Partial("_Notifications")
+            </div>
+        </div>
+    </div>   
+ </header>
+<div class="theme-color-picker">
+    <div id="configure-button" class="configure-button" data-expanded="false">
+        <a href="#"><i class="fa fa-cog fa-2x"></i></a>
+    </div>
+    <div class="color-options" id="color-options">
+        <h3>Preset Color</h3>
+        <div class="options-choosing-palette">
+            <ul>
+                <li><a href="#" rel="red" class="styleswitch red-picker"><div class="color-box red"></div></a></li>
+                <li><a href="#" rel="blue" class="styleswitch blue-picker"><div class="color-box blue"></div></a></li>
+                <li><a href="#" rel="yellow" class="styleswitch yellow-picker"><div class="color-box yellow"></div></a></li>                
+                <li><a href="#" rel="green" class="styleswitch green-picker"><div class="color-box green"></div></a></li>                
+            </ul>         
+        </div>
+    </div>
+</div>

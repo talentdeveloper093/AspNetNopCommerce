@@ -1,0 +1,16 @@
+﻿{
+  "Group": "Misc",
+  "FriendlyName": "New Products On Home",
+  "SystemName": "Misc.NewProductsOnHome",
+  "Version": "4.20",
+  "SupportedVersions": [
+    "4.20"
+  ],
+  "Author": "team",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Misc.NewProductsOnHome.dll",
+  "Description": "This plugin allows user seen all new products on home page. please add widget --home_page_newproducts_onhome--",
+  "LimitedToStores": [],
+  "LimitedToCustomerRoles": [],
+  "DependsOnSystemNames": null
+}

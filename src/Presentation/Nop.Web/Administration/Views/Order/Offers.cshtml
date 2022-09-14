@@ -1,0 +1,386 @@
+﻿@{
+    var defaultGridPageSize = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().DefaultGridPageSize;
+    var gridPageSizes = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().GridPageSizes;
+
+    //page title
+    ViewBag.Title ="Offers Dashboard";
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Offers");
+}
+<style>
+     .approvedOfferclr
+    {
+            background: green;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+      font-size:11px;
+    }
+
+       .rejectedOfferclr
+    {
+               background: red;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+    font-size:11px;
+    }
+
+            .pendingOfferclr
+    {
+                 font-size: 11px;
+    background: #caca38;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+    }
+
+             .paidOfferclr
+    {
+                 font-size: 11px;
+    background:#3c8dbc;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+    }
+
+                       .CoutnterOfferClrn, .defaultOfferclr
+    {
+                 font-size: 11px;
+    background:gray;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+    }
+
+                             .CompletedOfferclr
+    {
+                 font-size: 11px;
+    background:#bd2df9;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+    }
+
+                                .CompletedOfferclr
+    {
+                 font-size: 11px;
+    background:#d41401;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+    }
+
+                                          .expiredOfferclr
+    {
+                 font-size: 11px;
+    background:#2dcaf9;
+    color: white;
+    padding: 5px;
+    padding-right: 11px;
+    border-radius: 5px;
+    padding-left: 9px;
+    }
+
+                
+</style>
+@Html.AntiForgeryToken()
+<div class="content-header clearfix">
+    <h1 class="pull-left">
+        Offers Dashboard
+    </h1>
+    <div class="pull-right">
+        &nbsp;
+    </div>
+</div>
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+           
+             <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="col-md-6">
+                                    <label>Product Name</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" id="ProductNametxtbx" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="col-md-6">
+                                    <label>Status</label>
+                                </div>
+                                <div class="col-md-6">
+                                   <select class="form-control" id="Statusdrpdwn">
+                                       <option value="Select">Select</option>
+                                       <option value="Approved">Approved</option>
+                                       <option value="Rejected">Rejected</option>
+                                       <option value="Pending">Pending</option>
+                                       <option value="Expired">Expired</option>
+                                       <option value="Completed">Completed</option>
+                                       <option value="Countered By User">Countered By User</option>
+                                       <option value="Countered By Admin">Countered By Admin</option>
+                                       <option value="Order Canceled By Admin">Order Canceled By Admin</option>
+                                       <option value="Order Canceled By User">Order Canceled By User</option>
+                                   </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-7 col-md-offset-5">
+                            <button type="button" id="search-offers" class="btn btn-primary btn-search">
+                                <i class="fa fa-search"></i>
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                    <div id="neversoldreport-grid"></div>
+
+                    <script>
+                        $(document).ready(function () {
+                            $("#neversoldreport-grid").kendoGrid({
+                                dataSource: {
+                                    type: "json",
+                                    transport: {
+                                        read: {
+                                            url: "@Html.Raw(Url.Action("OffersList", "Order"))",
+                                            type: "POST",
+                                            dataType: "json",
+                                            data: additionalData
+                                        }
+                                    },
+                                    schema: {
+                                        data: "Data",
+                                        total: "Total",
+                                        errors: "Errors"
+                                    },
+                                    error: function(e) {
+                                        display_kendoui_grid_error(e);
+                                        // Cancel the changes
+                                        this.cancelChanges();
+                                    },
+                                    pageSize: @(defaultGridPageSize),
+                                    serverPaging: true,
+                                    serverFiltering: true,
+                                    serverSorting: true
+                                },
+                                pageable: {
+                                    refresh: true,
+                                    pageSizes: [@(gridPageSizes)],
+                                    @Html.Partial("_GridPagerMessages")
+                                },
+                                editable: {
+                                    confirmation: "@T("Admin.Common.DeleteConfirmation")",
+                                    mode: "inline"
+                                },
+                                scrollable: false,
+                                columns: [{
+                                    field: "ProductName",
+                                    title: "Product Name"
+                                },
+                                {
+                                    field: "MessageFromBuyer",
+                                    title: "Notes"
+                                }, 
+                                {
+                                    field: "OfferRequestedBy",
+                                    title: "Requester"
+                                },
+                                 {
+                                     field: "CreatedDate",
+                                     title: "Created On"
+                                 },
+                                  //{
+                                  //    field: "Categories",
+                                  //    title: "Category"
+                                  //},
+                                   {
+                                       field: "ActualPrice",
+                                       title: "Price"
+                                   },
+                                {
+                                    field: "OfferedPrice",
+                                    title: "Offer Amount"
+                                },
+                                  {
+                                      field: "OfferStatus",
+                                      title: "Status",
+                                      encoded: false
+                                  },
+                                {
+                                    field: "Action",
+                                    title: "Actions",
+                                    width: 100,
+                                    encoded: false,
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                 //   template: '<a class="btn btn-default" href="@Url.Content("~/Admin/Product/Edit/")#=ProductId#"><i class="fa fa-eye"></i>@T("Admin.Common.View")</a>'
+                                }]
+                            });
+                        });
+                    </script>
+
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $('#search-neversoldreport').click(function () {
+                                var grid = $('#neversoldreport-grid').data('kendoGrid');
+                                grid.dataSource.page(1); //new search. Set page size to 1
+                                //grid.dataSource.read(); we already loaded the grid above using "page" function
+                                return false;
+                            });
+                        });
+
+                        function additionalData() {
+                            var data = {
+                                SearchCategoryId: $('#SearchCategoryId').val(),
+                                SearchManufacturerId: $('#SearchManufacturerId').val(),
+                                SearchStoreId: $('#SearchStoreId').val(),
+                                SearchVendorId: $('#SearchVendorId').val(),
+                                ProductName: $('#ProductNametxtbx').val(),
+                                ProductStatus: $('#Statusdrpdwn').val()
+                            };
+                            addAntiForgeryToken(data);
+                            return data;
+                        }
+
+                        
+                        function UpdateOfferStatus(OfferId, $this)
+                        {
+                           
+                            var Status = $($this).data('id');
+
+                            var data = {
+                                OfferId: OfferId,
+                                Status: Status
+                            };
+
+                            $.ajax({
+                                cache: false,
+                                url: '/Admin/Order/UpdateOfferStatus',
+                                data:  addAntiForgeryToken(data),
+                                type: 'post',
+                                success: function (result) {
+                                    $("#neversoldreport-grid .k-pager-refresh").trigger('click');
+                                }
+                            });
+                        }
+
+
+                        function CounterOffer(OfferId)
+                        {
+                            $("#hiddenproductid").val(OfferId);
+                            $("#CounterOfferModal").modal("show");
+                        }
+
+                        function SubmitCountoffer()
+                        {
+                            var data = {
+                                OfferId: $("#hiddenproductid").val(),
+                                Price: $("#OfferModaltxtbx").val(),
+                                Message: $("#OfferModalMessageBx").val()
+                            };
+
+                            $.ajax({
+                                cache: false,
+                                url: '/Admin/Order/SubmitCountoffer',
+                                data: addAntiForgeryToken(data),
+                                type: 'post',
+                                success: function (result) {
+                                    $("#CounterOfferModal").modal("hide");
+                                    $("#OfferModaltxtbx").val('');
+                                    $("#neversoldreport-grid .k-pager-refresh").trigger('click');
+                                }
+                            });
+                        }
+                   
+                        function CancelOfferOrder(OfferId)
+                        {
+
+                            var data = {
+                                OfferId: OfferId
+                            };
+
+                            $.ajax({
+                                cache: false,
+                                url: '/Admin/Order/CancelOfferOrder',
+                                data:  addAntiForgeryToken(data),
+                                type: 'post',
+                                success: function (result) {
+                                    $("#neversoldreport-grid .k-pager-refresh").trigger('click');
+                                }
+                            });
+                        }
+
+                        function MarkOfferAsPaid(OfferId)
+                        {
+
+                            var data = {
+                                OfferId: OfferId
+                            };
+
+                            $.ajax({
+                                cache: false,
+                                url: '/Admin/Order/MarkOfferAsPaid',
+                                data:  addAntiForgeryToken(data),
+                                type: 'post',
+                                success: function (result) {
+                                    $("#neversoldreport-grid .k-pager-refresh").trigger('click');
+                                }
+                            });
+                        }
+
+                        $("#search-offers").click(function(){
+                            $("#neversoldreport-grid .k-pager-refresh").trigger('click');
+                        });
+                     </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="CounterOfferModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><b>Counter Offer</b></h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hiddenproductid" />
+                <p><b>Your Offer:</b> </p>
+                <p>$ <input type="number" id="OfferModaltxtbx" /></p>
+                <p>
+                    <textarea rows="3" cols="24" placeholder="note to buyer" id="OfferModalMessageBx"></textarea>
+                </p>
+                <p>
+                    <button class="btn btn-primary" type="button" onclick="SubmitCountoffer();return false;">
+                        Counter Offer
+                    </button>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>

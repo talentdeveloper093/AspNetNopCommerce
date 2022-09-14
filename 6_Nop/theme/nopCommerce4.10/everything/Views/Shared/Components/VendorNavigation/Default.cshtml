@@ -1,0 +1,25 @@
+﻿@model VendorNavigationModel
+@if (Model.Vendors.Count > 0)
+{
+    <div class="block block-vendor-navigation card">
+        <div class="card-header title">
+            <h4 class="card-title">@T("Vendors")</h4>
+        </div>
+        <div class="listbox">
+            <ul class="list-group list-group-flush">
+                @foreach (var vendor in Model.Vendors)
+                {
+                    <li class="list-group-item">
+                        <a href="@Url.RouteUrl("Vendor", new { SeName = vendor.SeName })"><i class="fa fa-angle-double-right" aria-hidden="true"></i> @vendor.Name</a>
+                    </li>
+                }
+            </ul>
+            @if (Model.TotalVendors > Model.Vendors.Count)
+            {
+                <div class="view-all">
+                    <a class="btn btn-secondary" href="@Url.RouteUrl("VendorList")">@T("Vendors.ViewAll")</a>
+                </div>
+            }
+        </div>
+    </div>
+}

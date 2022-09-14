@@ -1,0 +1,93 @@
+﻿@model NewsletterBoxModel
+<div class="newsletter">
+    @*<div class="title">
+        <strong>@T("Newsletter.Title")</strong>
+    </div>*@
+    <div class="newsletter-subscribe" id="newsletter-subscribe-block">
+        <div class="newsletter-email ml-md-auto">
+           <div class="form-group input-group mb-0">
+            <input asp-for="NewsletterEmail" id="newsletter-email" class="newsletter-subscribe-text form-control" placeholder=@T("Newsletter.Email.Placeholder") aria-label="@T("Newsletter.Subscribe")" />
+            <span class="input-group-append">
+            <button type="button" value="" id="newsletter-subscribe-button" class="btn btn-default newsletter-subscribe-button">
+                @T(Model.AllowToUnsubscribe ? "Newsletter.Options.Send" : "Newsletter.Options.Subscribe")
+            </button>
+             </span>     
+           </div>
+           @if (Model.AllowToUnsubscribe)
+            {
+                <div class="options">
+                    <div class="subscribe">
+                        <div class="custom-control custom-radio">
+                            <input class="custom-control-input" id="newsletter_subscribe" type="radio" value="newsletter_subscribe" name="newsletter_block" checked="checked" />
+                            <label class="custom-control-label" for="newsletter_subscribe">@T("Newsletter.Options.Subscribe")</label>
+                        </div>
+                    </div>
+                    <div class="unsubscribe">
+                        <div class="custom-control custom-radio">
+                            <input class="custom-control-input" id="newsletter_unsubscribe" type="radio" value="newsletter_unsubscribe" name="newsletter_block" />
+                            <label class="custom-control-label" for="newsletter_unsubscribe">@T("Newsletter.Options.Unsubscribe")</label>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="newsletter-validation">
+            <span id="subscribe-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+            <span asp-validation-for="NewsletterEmail"></span>
+        </div>
+    </div>
+    <div class="newsletter-result alert-danger" id="newsletter-result-block"></div>
+    <script asp-location="Footer">
+        function newsletter_subscribe(subscribe) {
+            var subscribeProgress = $("#subscribe-loading-progress");
+            subscribeProgress.show();
+            var postData = {
+                subscribe: subscribe,
+                email: $("#newsletter-email").val()
+            };
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.RouteUrl("SubscribeNewsletter"))",
+                data: postData,
+                success: function(data) {
+                    subscribeProgress.hide();
+                    $("#newsletter-result-block").html(data.Result);
+                    if (data.Success) {
+                        $('#newsletter-subscribe-block').hide();
+                        $('#newsletter-result-block').show();
+                    } else {
+                        $('#newsletter-result-block').fadeIn("slow").delay(2000).fadeOut("slow");
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert('Failed to subscribe.');
+                    subscribeProgress.hide();
+                }
+            });
+        }
+
+        $(document).ready(function () {
+           $('#newsletter-subscribe-button').on('click', function () {
+                @if (Model.AllowToUnsubscribe)
+                {
+                    <text>if ($('#newsletter_subscribe').is(':checked')) {
+                    newsletter_subscribe('true');
+                } else {
+                    newsletter_subscribe('false');
+                }</text>
+                }
+                else
+                {
+                    <text>newsletter_subscribe('true');</text>
+                }
+            });
+            $("#newsletter-email").on("keydown", function (event) {
+                if (event.keyCode == 13) {
+                    $("#newsletter-subscribe-button").trigger("click");
+                    return false;
+                }
+            });
+        });
+    </script>
+</div>

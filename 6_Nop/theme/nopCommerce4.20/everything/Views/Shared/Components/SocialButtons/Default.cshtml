@@ -1,0 +1,22 @@
+﻿@model SocialModel
+
+<div class="social-icons pt-2 pb-2">
+<ul class="networks">
+	@if (!string.IsNullOrEmpty(Model.FacebookLink))
+	{
+		<li class="facebook"><a href="@Model.FacebookLink" target="_blank"><i class="fab fa-facebook-f"></i> </a></li>
+	}
+	@if (!string.IsNullOrEmpty(Model.TwitterLink))
+	{
+		<li class="twitter"><a href="@Model.TwitterLink" target="_blank"><i class="fab fa-twitter"></i> </a></li>
+	}
+	@if (Model.NewsEnabled)
+	{
+		<li class="rss"><a href="@Url.RouteUrl("NewsRSS", new {languageId = Model.WorkingLanguageId})"><i class="fas fa-rss"></i> </a></li>
+	}
+	@if (!string.IsNullOrEmpty(Model.YoutubeLink))
+	{
+		<li class="youtube"><a href="@Model.YoutubeLink" target="_blank"><i class="fab fa-youtube"></i> </a></li>
+	}
+</ul>
+</div>

@@ -1,0 +1,83 @@
+﻿@model ProductEmailAFriendModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(Model.ProductName);
+    //page class
+    Html.AddTitleParts(T("PageTitle.ProductEmailAFriend").Text);
+    Html.AppendPageCssClassParts("html-email-a-friend-page");
+}
+<div class="page email-a-friend-page">
+    <div class="page-title">
+        <h1>@T("Products.EmailAFriend.Title")</h1>
+    </div>
+    <div class="page-body">
+        <div class="title">
+            <h2><a href="@Url.RouteUrl("Product", new { SeName = Model.ProductSeName })" class="product">@Model.ProductName</a></h2>
+        </div>
+        @if (Model.SuccessfullySent)
+        {
+            <div class="result alert alert-success">
+                @Model.Result
+            </div>
+        }
+        else
+        {
+            <form asp-route="ProductEmailAFriend" method="post">
+                <div asp-validation-summary="ModelOnly" class="message-error alert alert-danger"></div>
+                <div class="fieldset">
+                    <div class="form-fields">
+                        <div class="form-group row">
+                            <label asp-for="FriendEmail" class="offset-md-1 offset-lg-2 offset-xl-3 col-sm-12 col-md-3 col-lg-2 col-xl-2 col-form-label pl-0 pr-0" asp-postfix=":"></label>
+                            <div class="col-sm-12 col-md-5 col-lg-5 col-xl-4">
+                                <input asp-for="FriendEmail" class="friend-email form-control" placeholder="@T("Products.EmailAFriend.FriendEmail.Hint")" />
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                <span asp-validation-for="FriendEmail"></span>
+                                <nop-required />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label asp-for="YourEmailAddress" asp-postfix=":" class="offset-md-1 offset-lg-2 offset-xl-3 col-sm-12 col-md-3 col-lg-2 col-xl-2 col-form-label pl-0 pr-0"></label>
+                            <div class="col-sm-12 col-md-5 col-lg-5 col-xl-4">
+                                <input asp-for="YourEmailAddress" class="your-email form-control" placeholder="@T("Products.EmailAFriend.YourEmailAddress.Hint")" />
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                <span asp-validation-for="YourEmailAddress"></span>
+                                <nop-required />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label asp-for="PersonalMessage" asp-postfix=":" class="offset-md-1 offset-lg-2 offset-xl-3 col-sm-12 col-md-3 col-lg-2 col-xl-2 col-form-label pl-0 pr-0"></label>
+                            <div class="col-sm-12 col-md-5 col-lg-5 col-xl-4">
+                                <textarea asp-for="PersonalMessage" class="your-email form-control" placeholder="@T("Products.EmailAFriend.PersonalMessage.Hint")"></textarea>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                <span asp-validation-for="PersonalMessage"></span>
+                                <nop-required />
+                            </div>
+                        </div>
+                        @if (Model.DisplayCaptcha)
+                        {
+                            <div class="form-group row">
+                                <div class="offset-md-4 offset-lg-4 offset-xl-5 col-md-5 col-lg-5 col-xl-4">
+                                    <div class="captcha-box">
+                                        <nop-captcha />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="offset-md-4 offset-lg-4 offset-xl-5 col-md-5 col-lg-5 col-xl-4">
+                        <div class="buttons">
+                            <input type="submit" name="send-email" class="btn btn-primary button-1 send-email-a-friend-button" value="@T("Products.EmailAFriend.Button")" />
+                        </div>
+                    </div>
+                </div>
+             </form>
+         }
+    </div>
+</div>

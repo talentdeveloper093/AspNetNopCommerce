@@ -1,0 +1,49 @@
+﻿@model ShoppingCartModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.ShoppingCart").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-shopping-cart-page");
+}
+@if (!Model.OnePageCheckoutEnabled)
+{
+    @await Component.InvokeAsync("CheckoutProgress", new { step = CheckoutProgressStep.Cart })
+}
+<div class="onepageview">
+<div class="container">
+    <div class="panel-heading">
+        <h3>@T("ShoppingCart")</h3>
+    </div>
+    <div class="order-progress">
+        <ul>
+            <!-- Rectangle Banners -->
+            <li class="active_position">
+                <a><i class="fas fa-shopping-cart fa-2x"></i> <span>@T("Checkout.Progress.Cart")</span> </a>
+            </li>
+            <li class="deactive_position">
+                <a><i class="fas fa-map-marker-alt fa-2x"></i><span>@T("Checkout.Progress.Address")</span></a>
+            </li>
+            <li class="deactive_position">
+                <a><i class="fas fa-truck fa-2x"></i><span>@T("Checkout.Progress.Shipping")</span></a>
+            </li>
+            <li class="deactive_position">
+                <a><i class="far fa-credit-card fa-2x"></i><span>@T("Checkout.Progress.Payment")</span></a>
+            </li>
+            <li class="deactive_position">
+                <a><i class="far fa-thumbs-up fa-2x"></i><span>@T("Checkout.Progress.Confirm")</span></a>
+            </li>
+            <li class="deactive_position">
+                <a><i class="far fa-check-circle fa-2x"></i> <span>@T("Checkout.Progress.Complete")</span></a>
+            </li>
+            <!-- end: Rectangle Banners -->
+        </ul>
+    </div>
+<div class="page shopping-cart-page">    
+    <div class="page-body panel-body">
+        @await Component.InvokeAsync("OrderSummary", new { overriddenModel = Model})
+    </div>
+</div>
+</div>
+</div>
